@@ -29,7 +29,6 @@
       author: 'David M. Berry', citeAuthor: 'Berry, D. M.',
       purpose: 'A bench for reading two documents side by side, in two columns of equal standing, after Jacques Derrida’s <i>Glas</i> (1974). Neither column is the commentary on the other. Its case is a technical document on AI set beside a text from the critical tradition, read against each other. Links across the gutter, which Derrida calls <i>judas</i>, are the bench’s main data.',
       inside: 'Two documents at a time, each chosen from a pool, rendered as held and read against each other. Highlights, links and notes are the reader’s own.',
-      sources: 'A year-long reading programme of fortnightly sessions, each pairing a technical document on AI with texts from the critical tradition. Example programme: technical and critical readings on AI, 2026–27.',
       code: 'https://github.com/Computational-Hermeneutics/glas-bench',
       catalogue: { skip: [], held: 'held as source' }
     },

@@ -61,11 +61,17 @@ button.badge.err { cursor: pointer; font: inherit; }
 
 .legend span[title] { cursor: help; }
 
-/* ---------- top bar ---------- */
-.brand-name { display: inline-flex; flex-direction: column; gap: 3px; }
-
+/* ---------- top bar: the brand, the tabs and the tools on one row ---------- */
+header.bar { padding-top: 0; padding-bottom: 0; gap: 12px; }
+.brand-name { display: inline-flex; flex-direction: row; gap: 5px; align-items: baseline; }
 .brand-name b { margin-left: 0; }
+.brand .bench-ver { align-self: center; margin-bottom: 0; }
+header.bar .tabs { flex: 1 1 auto; min-width: 0; align-self: stretch; padding: 0; background: none; border-bottom: 0; }
+header.bar .tabs button { padding: 13px 11px 11px; color: color-mix(in srgb, var(--bar-fg) 70%, transparent); }
+header.bar .tabs button:hover, header.bar .tabs button.on, header.bar .tabs button[aria-expanded="true"] { color: var(--bar-fg); }
+header.bar .tabs .tabs-map { color: color-mix(in srgb, var(--bar-fg) 55%, transparent); }
 .bar-right { margin-left: auto; }
+@media (max-width: 760px) { header.bar .brand-name, header.bar .bench-ver { display: none; } }
 
 /* ---------- the language, beside the picker ---------- */
 .vlang { font: 10px var(--mono); letter-spacing: 0.5px; color: var(--text-faint); margin-left: 8px; white-space: nowrap; }
@@ -90,6 +96,34 @@ button.badge.err { cursor: pointer; font: inherit; }
   --bar-1: #1b1811; --bar-2: #15130e; --bar-fg: #ece6d6; --bar-line: #0a0906;
 }
 
+:root { --page-ground: #0e0c08; }   /* the ground the PDF pages sit on */
+
+/* The light themes, in Glas's colours: warm paper and dark ink, with an ochre gold in place of
+   the kit's Spacewar blue bar and magenta accent. */
+:root[data-theme="paper"] {
+  --code-bg: #f7f3ea; --page-ground: #e6dfcd;
+  --bg: #f3eee2; --bg-2: #ebe4d4; --surface: #fbf8f1; --surface-2: #ece5d5;
+  --line: #cdc2a8; --line-soft: #e0d8c5;
+  --text: #221d14; --text-dim: #574d3c; --text-faint: #7d725d;
+  --beam: #7a5a10; --amber: #8a6516;
+  --hl: rgba(138, 101, 22, 0.12); --sel: rgba(138, 101, 22, 0.14); --noted-bg: rgba(138, 101, 22, 0.06);
+  --bar-1: #ece5d5; --bar-2: #e6dfcd; --bar-fg: #221d14; --bar-line: #cdc2a8;
+  --pick-bg: rgba(255, 255, 255, 0.6); --pick-fg: #221d14; --pick-line: rgba(34, 29, 20, 0.22);
+  --plate-line: #cdc2a8; --on-amber: #fffaf0;
+}
+:root[data-theme="white"] {
+  --page-ground: #eceef1;
+  --beam: #6f520c; --amber: #85621a;
+  --hl: rgba(133, 98, 26, 0.10); --sel: rgba(133, 98, 26, 0.12); --noted-bg: rgba(133, 98, 26, 0.05);
+}
+:root[data-theme="sepia"] {
+  --page-ground: #e9e1d1;
+  --beam: #7a4f12; --amber: #8a5a14;
+  --hl: rgba(138, 90, 20, 0.12); --sel: rgba(138, 90, 20, 0.14); --noted-bg: rgba(138, 90, 20, 0.06);
+}
+:root[data-theme="green"] { --page-ground: #010602; }
+:root[data-theme="amber"], :root[data-theme="contrast"] { --page-ground: #050505; }
+
 /* the header version picker is not used by the Pair view (each column has its own) */
 header.bar .pick { display: none; }
 
@@ -113,7 +147,7 @@ header.bar .pick { display: none; }
   border: 1px solid var(--line); border-radius: 5px; padding: 3px 6px; font: inherit; }
 .pair-head .pair-zoom { flex: 0 0 auto; display: inline-flex; gap: 2px; }
 
-.pair-scroll { flex: 1 1 auto; min-height: 0; overflow: auto; padding: 12px; background: var(--code-bg); }
+.pair-scroll { flex: 1 1 auto; min-height: 0; overflow: auto; padding: 12px; background: var(--page-ground); }
 .pair-pages { display: flex; flex-direction: column; align-items: center; gap: 12px; }
 .pair-load, .pair-open { padding: 18px; }
 .pair-open .btn { background: var(--surface-2); color: var(--text); border: 1px solid var(--amber);
@@ -213,3 +247,9 @@ body.judas-inserting .textLayer { cursor: copy; }
 .ins-card .ins-head { color: var(--amber); font-size: 11px; letter-spacing: .3px; margin-bottom: 3px; }
 .ins-card .ins-quote { font-style: italic; color: var(--text-dim); }
 .ins-card .ins-note { margin-top: 5px; padding-top: 5px; border-top: 1px solid var(--line-soft); color: var(--text); }
+
+/* ---------- text over the documents: sized by the kit's code size (Settings, A− and A+) ---------- */
+.ins-card { font-size: var(--code-size, 13px); }
+.ins-card .ins-head { font-size: 0.85em; }
+.hl-pop, .hl-pop .hl-tags, .hl-pop .hl-note, .hl-pop .btn, .judas-menu, .judas-mrow { font-size: var(--code-size, 13px); }
+.hl-pop .hl-quote, .judas-row { font-size: 0.95em; }

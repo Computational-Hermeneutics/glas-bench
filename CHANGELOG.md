@@ -2,6 +2,10 @@
 
 Changes to the bench. The bench keeps its own version numbers, raised by 0.0.1 with each change (the `?v=` on every script and stylesheet in `index.html`); this file records the versions published, newest first.
 
+## 0.2.6 (2026-10-14)
+
+- The tabs move up into the top bar beside the brand, saving a row. The light colour themes (Listing paper, Paper, Sepia) take Glas's colours, warm paper and dark ink with an ochre gold, in place of the kit's Spacewar blue bar and magenta accent; the ground the PDF pages sit on follows each theme. A new icon: two columns with a judas across the gutter. The About box's Sources row is removed. The kit's code size (Settings, and A− and A+ in the top bar) now sizes the bench's own text over the documents, the insert cards, the editors and the list of links elsewhere; `js/textsize.js` relabels that part of Settings and hides the controls that only apply to code listings.
+
 ## 0.2.5 (2026-10-14)
 
 - The bench moves to the root of the repository and is published on GitHub Pages at https://computational-hermeneutics.github.io/glas-bench/. Everything that was under `research/` is now at the root; the kit submodule is at `kit/`; the placeholder sources under `source/` are read from beside the bench; `config.js` takes the new base address; the tests run with `--dir .`. A Pages workflow publishes the repository with the kit checked out. The README carries the link.
