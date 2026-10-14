@@ -1,7 +1,7 @@
 # Glas Bench: plan
 
 **Author:** David M. Berry
-**Status:** approved 2026-10-14; Phase 0 (skeleton) done, Phase 1 next
+**Status:** approved 2026-10-14. Phase 0 done; Phase 1 (two-column Pair reader) working. See HANDOFF.md.
 **Built on:** bench-kit 0.60.0, from bench-template 0.1.82
 
 Glas Bench reads two documents side by side in two columns of equal standing, after Derrida's *Glas* (1974). Its case is a technical AI document set beside a text from the critical tradition, read against each other. Links across the gutter, which Derrida calls *judas*, are the main data. It is a static site on GitHub Pages, built on bench-kit, with no build step.

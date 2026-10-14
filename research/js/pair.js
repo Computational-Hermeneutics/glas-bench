@@ -60,12 +60,14 @@
   }
   function sources(d) {
     var list = [], src = d.source || {};
-    var localUrl = isLocal ? '_local/' + d.id + '.pdf' : null;
-    if (src.kind === 'url' && src.url) { if (localUrl) list.push(localUrl); list.push(src.url); return Promise.resolve(list); }
-    // a paratext (copyrighted) document: the library first, then the dev copy on localhost
+    // the library copy committed in this private research repository, loaded same-origin
+    var libUrl = 'lib/' + d.id + '.pdf';
+    if (src.kind === 'url' && src.url) { list.push(libUrl); list.push(src.url); return Promise.resolve(list); }
+    // a paratext (copyrighted) document: the kit's paratext library first (when a token is set),
+    // then the library copy in this repository
     return paratextURL(src.paratext).then(function (u) {
       if (u) list.push(u);
-      if (localUrl) list.push(localUrl);
+      list.push(libUrl);
       return list;
     });
   }
@@ -85,6 +87,13 @@
 
   // ---- view scaffold ----
   var root_el = null;
+  // size the two-column area to fill the space below the top bar and tabs
+  function fit() {
+    if (!root_el) return;
+    var w = SW.$('.pair-wrap', root_el); if (!w) return;
+    var top = w.getBoundingClientRect().top;
+    w.style.height = Math.max(240, window.innerHeight - top - 6) + 'px';
+  }
   function build() {
     var host = SW.$('#view-pair');
     host.innerHTML = '';
