@@ -41,8 +41,8 @@
   function title(d) { return d && d.csl ? d.csl.title : ''; }
 
   // A document's PDF is drawn from the paratext library (the private repository the kit reads
-  // with each member's token). An open item (arXiv) is loaded from its URL. On localhost a
-  // gitignored dev copy under _local/ stands in, so the bench renders before a token is set.
+  // with each member's token) when a token is set, then from a copy under lib/, then (an open
+  // item) from its URL.
   // sources(d) resolves to a list of URLs to try in order.
   function paratextURL(code) {
     var P = SW.paratexts, BP = SW.BENCH.paratexts;
@@ -60,7 +60,7 @@
   }
   function sources(d) {
     var list = [], src = d.source || {};
-    // the library copy committed in this private research repository, loaded same-origin
+    // the copy held under lib/ in this repository, loaded same-origin
     var libUrl = 'lib/' + d.id + '.pdf';
     if (src.kind === 'url' && src.url) { list.push(libUrl); list.push(src.url); return Promise.resolve(list); }
     // a paratext (copyrighted) document: the kit's paratext library first (when a token is set),

@@ -1,6 +1,10 @@
 # Changelog: Glas Bench
 
-Changes to the bench (`research/`). The bench keeps its own version numbers, raised by 0.0.1 with each change (the `?v=` on every script and stylesheet in `index.html`); this file records the versions published, newest first.
+Changes to the bench. The bench keeps its own version numbers, raised by 0.0.1 with each change (the `?v=` on every script and stylesheet in `index.html`); this file records the versions published, newest first.
+
+## 0.2.5 (2026-10-14)
+
+- The bench moves to the root of the repository and is published on GitHub Pages at https://computational-hermeneutics.github.io/glas-bench/. Everything that was under `research/` is now at the root; the kit submodule is at `kit/`; the placeholder sources under `source/` are read from beside the bench; `config.js` takes the new base address; the tests run with `--dir .`. A Pages workflow publishes the repository with the kit checked out. The README carries the link.
 
 ## 0.2.4 (2026-10-14)
 

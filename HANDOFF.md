@@ -1,14 +1,14 @@
 # Glas Bench: handoff and current state
 
 Written 2026-10-14 to continue the build in another session (including on cloud credits).
-Read this with [`PLAN.md`](PLAN.md) (the data model and phasing) and `research/CHANGELOG.md`.
+Read this with [`PLAN.md`](PLAN.md) (the data model and phasing) and `CHANGELOG.md`.
 
 ## What it is
 
 A static research bench that reads two documents side by side, a column each, after Derrida's
 *Glas*. The case: a technical document on AI against a text from the critical tradition, read
 against each other. Links across the gutter (the *judas*) are the main data. Built on bench-kit
-(`research/kit`, a submodule pinned at v0.60.0). No build step.
+(`kit`, a submodule pinned at v0.60.0). No build step.
 
 ## Where the build is now
 
@@ -30,14 +30,14 @@ against each other. Links across the gutter (the *judas*) are the main data. Bui
 
 **Direction (2026-10-14): hermes-kit.** Glas is the first instance of a new, fully standalone
 kit, `Computational-Hermeneutics/hermes-kit` (currently empty, GPL-3), for comparative
-hermeneutic tools. Finish Phase 3 here, then extract the reusable modules into hermes-kit, swap
-the submodule, drop `research/` and serve at the repo root. See PLAN.md, Direction. Note: a
+hermeneutic tools. Finish Phase 3 here, then extract the reusable modules into hermes-kit and swap
+the submodule. (The bench already sits at the repo root, since 0.2.5.) See PLAN.md, Direction. Note: a
 cloud session needs the Claude GitHub App installed on hermes-kit to push to it.
 
 Not yet built (next): threads and cross-session links, the Sessions and Threads views, search,
 exports and the Glas print view. See **What is next** below.
 
-**Verifying headless in a cloud session:** serve from the repo root, not `research/`. The cloud
+**Verifying headless in a cloud session:** serve from the repo root. The cloud
 network policy blocks cdnjs, so feed Playwright the PDF.js 3.11.174 build from npm
 (`npm pack pdfjs-dist@3.11.174`) by routing the cdnjs URLs to it.
 
@@ -46,7 +46,8 @@ network policy blocks cdnjs, so feed Playwright the PDF.js 3.11.174 build from n
 ```
 cd glas-bench
 python3 -m http.server 8000
-# open http://localhost:8000/research/   (opens on the Pair view)
+# open http://localhost:8000/   (opens on the Pair view)
+# live: https://computational-hermeneutics.github.io/glas-bench/
 ```
 
 Clone fresh (the kit is a submodule, the source PDFs are committed in this private repo):
@@ -55,22 +56,22 @@ Clone fresh (the kit is a submodule, the source PDFs are committed in this priva
 git clone --recurse-submodules https://github.com/Computational-Hermeneutics/glas-bench
 ```
 
-In a cloud session the committed `research/lib/` PDFs travel with the repo, so the Pair reader
+In a cloud session the committed `lib/` PDFs travel with the repo, so the Pair reader
 renders with no token and no extra setup.
 
 ## Repository
 
 - **Computational-Hermeneutics/glas-bench**, private. Author commits as
   `David M. Berry <1429428+dmberry@users.noreply.github.com>`, no co-author trailer, `gh` CLI.
-- Kit submodule at `research/kit`, pinned v0.60.0 (`159f252`). Never edit files under
-  `research/kit`; kit changes go to bench-kit itself (see kit-first below).
-- Private, so GitHub Pages is not serving yet (a private-repo Pages needs a paid org plan).
-  Decision 2026-10-14: keep private for now, verify locally.
+- Kit submodule at `kit`, pinned v0.60.0 (`159f252`). Never edit files under
+  `kit`; kit changes go to bench-kit itself (see kit-first below).
+- Public, served on GitHub Pages by `.github/workflows/pages.yml` (Pages source: GitHub Actions).
+  The bench sits at the repository root (moved from `research/` in 0.2.5).
 
 ## How the pieces fit
 
 - **Document = build.** A document maps onto the kit's idea of a build (one text fetched). The
-  Pair reader (`research/js/pair.js`) drives PDF.js itself and does not use the kit's version
+  Pair reader (`js/pair.js`) drives PDF.js itself and does not use the kit's version
   machinery; the kit's version picker in the top bar is hidden by CSS.
 - **Views** (`js/main.js`, `SW.BENCH.shell.views`): `pair` (default), `read` (one document, the
   kit's, still on the placeholder example), `about`, `findings`, `notes`, `paratexts`. The
@@ -79,15 +80,15 @@ renders with no token and no extra setup.
   1. The kit's **paratext library** (the private paratexts repo it reads with each member's
      token) when a token is set and the document has a `paratext` P-code. This is the designed
      home; `glas_paratexts` is not populated yet.
-  2. **`research/lib/<id>.pdf`**, a copy committed in this private repo, loaded same-origin. This
+  2. **`lib/<id>.pdf`**, a copy committed in this private repo, loaded same-origin. This
      is what renders today in dev and in the cloud.
   3. The open **URL** (arXiv) for open items. Note: arXiv sends no CORS header, so an in-browser
      fetch of the arXiv PDF is blocked; `lib/` is why Song renders. A proxy or the library is
      needed for URL loading in production.
 
-## The source PDFs (`research/lib/`)
+## The source PDFs (`lib/`)
 
-This is a private academic research space, so the copyrighted source PDFs are committed here
+This is an academic research space, so the source PDFs are committed here
 (David's instruction, 2026-10-14). They are the render copies for the bench. The work-canonical
 originals are untouched in `~/Library/CloudStorage/Dropbox/WritingLab/knowledge/sources/cpct-2026-27/`.
 
@@ -102,7 +103,7 @@ Files, by document id:
 - `benjamin-lacis-naples.pdf` (critical; Zotero ZJPWVK44)
 - `bloch-italy-porosity.pdf` (critical; Zotero CIRZXCPI)
 
-## The data model (`research/js/programme.js`)
+## The data model (`js/programme.js`)
 
 `SW.PROGRAMME` holds `docs` (keyed by id, each with role technical/critical, CSL-JSON, a Zotero
 key, and a source) and `sessions` (14 fortnightly dates, 14 Oct 2026 to 2 Jun 2027). Session 1
@@ -127,7 +128,7 @@ Prototype in the bench first (David's choice), then promote the reusable parts t
 - **Phase 5: the worked example and the writing.** Session 1 example links and one thread; all 14
   sessions' pools as metadata; the other documents into `lib/` (and/or the `glas_paratexts`
   library); About, Help, tour and README (plain, British spelling); the bench icon
-  (`research/img/icon.svg` is still the template's).
+  (`img/icon.svg` is still the template's).
 
 **Kit-first candidates** to promote to bench-kit once settled: the two-column reader, the
 quote-selector anchoring for PDFs, the cross-document (judas) links, and threads. `git fetch`
@@ -136,14 +137,14 @@ clone or worktree of bench-kit. Update its CHANGELOG, tag, push, then move the s
 
 ## Loose ends and notes
 
-- The genealogy-half kit scripts are still loaded in `research/index.html` (harmless, views off);
+- The genealogy-half kit scripts are still loaded in `index.html` (harmless, views off);
   trim them when the Pair view fully replaces Read.
 - `js/versions.js`, `js/core.js`, `source/` and the Read tab still carry the template's Python
   placeholder. Remove or repurpose when Read is reworked for single documents.
 - The welcome tour, About box `inside`/`sources`, and `annoHelp` still read for the old template
   in places; rewrite for Glas in Phase 5.
 - `?v=` on scripts/stylesheets is at `0.2.1`; raise it by 0.0.1 on each change so browsers fetch
-  fresh copies, and set `bench-date` in `research/index.html`.
+  fresh copies, and set `bench-date` in `index.html`.
 - `glas_paratexts` (the kit's separate paratext library) is referenced in `config.js` but not
   created or populated. The reader already supports it; populating it is optional given `lib/`.
 
@@ -153,12 +154,12 @@ clone or worktree of bench-kit. Update its CHANGELOG, tag, push, then move the s
 PLAN.md                     the plan and data model (approved)
 HANDOFF.md                  this file
 README.md                   plain project README
-research/index.html         the bench: tabs, views, script load order
-research/js/config.js       bench identity and kit settings (genealogy half off)
-research/js/main.js         views + the query hook that opens on Pair
-research/js/programme.js    the programme: documents and sessions (Session 1 full)
-research/js/pair.js         the Pair view: two-column PDF reader, source resolution
-research/css/research.css   Glas gold theme tokens + Pair layout + PDF text-layer CSS
-research/lib/               committed source PDFs (private research space)
-research/kit/               bench-kit submodule (v0.60.0) - do not edit
+index.html         the bench: tabs, views, script load order
+js/config.js       bench identity and kit settings (genealogy half off)
+js/main.js         views + the query hook that opens on Pair
+js/programme.js    the programme: documents and sessions (Session 1 full)
+js/pair.js         the Pair view: two-column PDF reader, source resolution
+css/research.css   Glas gold theme tokens + Pair layout + PDF text-layer CSS
+lib/               committed source PDFs (academic research space)
+kit/               bench-kit submodule (v0.60.0) - do not edit
 ```

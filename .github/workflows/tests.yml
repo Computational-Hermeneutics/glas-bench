@@ -1,4 +1,4 @@
-# The bench's tests (bench-kit's tools/test.js: every page in research/tests/, in headless Chrome)
+# The bench's tests (bench-kit's tools/test.js: every page in tests/, in headless Chrome)
 name: Tests
 on:
   push:
@@ -19,4 +19,4 @@ jobs:
         with:
           node-version: 22
       - name: Tests
-        run: node research/kit/tools/test.js
+        run: node kit/tools/test.js --dir .

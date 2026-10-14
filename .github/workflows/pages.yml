@@ -1,6 +1,6 @@
 # Publish the bench on GitHub Pages: https://computational-hermeneutics.github.io/glas-bench/
 # The site is the repository as it stands, with the kit submodule checked out. There is no build
-# step. The root index.html opens the bench in research/.
+# step. The bench is at the root of the repository.
 name: Pages
 on:
   push:

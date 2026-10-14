@@ -1,4 +1,4 @@
-/* config.js - Glas Bench's settings for bench-kit (research/kit). Loaded after kit/base.js,
+/* config.js - Glas Bench's settings for bench-kit (kit/). Loaded after kit/base.js,
  * before the rest of the kit and the bench's own scripts. The kit's README lists every setting.
  *
  * Glas Bench reads two documents side by side, after Derrida's Glas (1974). This is the
@@ -13,7 +13,7 @@
     title: 'Glas Bench',
     slug: 'glas',
     store: 'glasbench.',                                   // unique prefix for this bench's keys in the browser
-    base: 'https://computational-hermeneutics.github.io/glas-bench/research/',
+    base: 'https://computational-hermeneutics.github.io/glas-bench/',
     repo: 'https://github.com/Computational-Hermeneutics/glas-bench',
     refs: { names: { v1: 'EX1', v2: 'EX2' }, prefix: 'EX-', dir: 'source' },   // placeholder, until documents land
     forks: [['main', 'Documents']],

@@ -8,9 +8,8 @@
  *   { kind: 'url' }       an open item (arXiv, an open web page), loaded from its URL
  *   { kind: 'paratext' }  a copyrighted text, loaded from the private paratexts repository (P-code)
  *   { kind: 'local' }     a file the reader opens in the browser; never uploaded
- * No copyrighted PDF or its text is held in this repository. For development, local copies of
- * the PDFs live in the gitignored research/_local/ and are loaded only on localhost
- * (see pair.js, devLocal).
+ * Copies of the session's PDFs are held under lib/ for reading and testing (see pair.js,
+ * sources); the designed home for copyrighted texts is the private paratexts repository.
  *
  * This is the example programme. The organisers, the institution and the seminar's title are
  * not named here. Session 1 is built in full; the later sessions carry their dates and fill in

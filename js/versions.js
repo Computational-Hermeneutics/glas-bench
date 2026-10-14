@@ -11,7 +11,7 @@
 (function (root) {
   'use strict';
 
-  var SRC = '../source/';
+  var SRC = 'source/';
 
   // the list's machinery (links, descent, loading) is bench-kit's kit/versionlist.js
   var L = root.SWVersionList || require('../kit/versionlist.js'), files = L.files;
