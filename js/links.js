@@ -12,8 +12,8 @@
  * each document is read in, and can join passages across sessions as well as across a pair. Links
  * are the reader's own and kept in this browser under glasbench.links; nothing is sent anywhere.
  *
- * The insert variant (a passage from one column shown inside the other at a point) is noted in
- * PLAN.md and comes next. Bench-only code; a kit-first candidate once settled.
+ * Comments dropped on a page as post-it notes are postits.js; Insert in the highlight editor
+ * makes one beside its passage. Bench-only code; a kit-first candidate once settled.
  */
 (function (root) {
   'use strict';
@@ -29,10 +29,12 @@
   function get(id) { return all().filter(function (l) { return l.id === id; })[0] || null; }
   function quoteOf(hid) { var h = H() && H().get(hid); return h ? (h.selector.exact || '').replace(/\s+/g, ' ').trim() : ''; }
   function docOf(hid) { var h = H() && H().get(hid); return h ? h.doc : null; }
-  // a highlight's colour as solid ink, for the curves, their end dots and the insert cards' edges
+  // a highlight's colour as solid ink, for the curves and their end dots
   function inkOf(hid) { var h = H() && H().get(hid); return H().paintOf(h && h.colour).replace(/[\d.]+\)$/, '0.95)'); }
-  // the two documents a link touches: for a join both highlights' docs; for an insert the source's doc and the target doc
-  function linkDocs(l) { return [docOf(l.a), l.kind === 'insert' ? (l.insertAt && l.insertAt.doc) : docOf(l.b)]; }
+  // the two documents a join touches
+  function linkDocs(l) { return [docOf(l.a), docOf(l.b)]; }
+  // the joins; links of the earlier insert design (kind 'insert') are kept in storage but not shown
+  function joins() { return all().filter(function (l) { return l.kind !== 'insert'; }); }
 
   // ---- geometry: a highlight's painted rectangles, and its inner edge toward the gutter ----
   function rectsOf(id) { return [].slice.call(document.querySelectorAll('.pair-col .hl-rect[data-id="' + id + '"]')); }
@@ -69,81 +71,6 @@
     return true;
   }
 
-  // ---- making an insert: a passage shown inside the other column at a chosen point ----
-  var inserting = null;    // { sourceHid, targetSide, targetDoc }
-  function startInsert(sourceHid) {
-    var side = sideOf(sourceHid);
-    if (!side) { SW.toast('Open the passage in a column first'); return; }
-    var target = side === 'left' ? 'right' : 'left';
-    var COL = SW.pair && SW.pair.col;
-    var targetDoc = COL && COL[target] && COL[target].docId;
-    if (!targetDoc) { SW.toast('Open a document in the other column first'); return; }
-    inserting = { sourceHid: sourceHid, targetSide: target, targetDoc: targetDoc };
-    if (H()) H().closeEditor();
-    document.body.classList.add('judas-inserting');
-    SW.toast('Now click a point in the ' + target + ' column where the passage should appear', 5000);
-  }
-  function cancelInsert() { inserting = null; document.body.classList.remove('judas-inserting'); }
-  // place the insert where the reader clicks in the target column (capture, ahead of the highlight layer)
-  document.addEventListener('click', function (ev) {
-    if (!inserting) return;
-    var span = ev.target.closest && ev.target.closest('.pair-col[data-side="' + inserting.targetSide + '"] .textLayer span');
-    if (!span || !span.firstChild) return;
-    ev.stopPropagation();
-    var pageEl = span.closest('.pdf-page'); if (!pageEl) { cancelInsert(); return; }
-    var r = document.createRange();
-    r.setStart(span.firstChild, 0);
-    r.setEnd(span.firstChild, Math.min(24, span.firstChild.length));
-    var selector = H().selectorForRange(pageEl, r);
-    if (!selector) { SW.toast('Could not anchor there; try another point'); return; }
-    var link = { id: uid(), a: inserting.sourceHid, kind: 'insert',
-      insertAt: { doc: inserting.targetDoc, selector: selector, page: +pageEl.dataset.n },
-      note: '', by: by(), created: new Date().toISOString() };
-    var a = all(); a.push(link); saveAll(a);
-    var td = inserting.targetDoc; cancelInsert();
-    repaintInsertsDoc(td);
-    openLink(link.id, ev.clientX, ev.clientY);
-  }, true);
-
-  // ---- painting insert cards into the target column ----
-  function srcCite(hid) { var h = H() && H().get(hid); if (!h) return ''; var d = SW.PROGRAMME && SW.PROGRAMME.doc(h.doc); return d && d.short ? d.short : h.doc; }
-  function insDocLabel(l) { var d = SW.PROGRAMME && SW.PROGRAMME.doc(l.insertAt && l.insertAt.doc); return d && d.short ? d.short : (l.insertAt ? l.insertAt.doc : ''); }
-  function insLayer(pageEl) {
-    var o = pageEl.querySelector('.ins-layer');
-    if (!o) { o = el('div', { class: 'ins-layer' }); pageEl.appendChild(o); }
-    return o;
-  }
-  function paintInserts(side, docId, pageEl, n) {
-    var o = insLayer(pageEl); o.innerHTML = '';
-    var pageRect = pageEl.getBoundingClientRect();
-    var edge = side === 'left' ? 'right' : 'left';   // the card hugs the gutter edge of the page
-    all().filter(function (l) { return l.kind === 'insert' && l.insertAt && l.insertAt.doc === docId && (!l.insertAt.page || l.insertAt.page === n); }).forEach(function (l) {
-      var range = H().rangeInPage(pageEl, l.insertAt.selector);
-      var top = 6;
-      if (range) { var rc = range.getBoundingClientRect(); top = rc.top - pageRect.top; }
-      var card = el('div', { class: 'ins-card', 'data-id': l.id });
-      card.style.top = Math.max(2, top) + 'px';
-      card.style[edge] = '6px';
-      card.style.borderColor = inkOf(l.a);   // the card's edge in its source passage's colour
-      card.innerHTML = '<div class="ins-head">↳ ' + esc(srcCite(l.a)) + '</div>' +
-        '<div class="ins-quote">' + esc(quoteOf(l.a).slice(0, 240)) + '</div>' +
-        (l.note ? '<div class="ins-note">' + esc(l.note) + '</div>' : '');
-      card.onclick = function (ev) { ev.stopPropagation(); openLink(l.id, ev.clientX, ev.clientY); };
-      o.append(card);
-    });
-  }
-  function repaintInsertsDoc(docId) {
-    var COL = SW.pair && SW.pair.col; if (!COL) return;
-    ['left', 'right'].forEach(function (side) {
-      var c = COL[side]; if (!c || c.docId !== docId) return;
-      c.pages.querySelectorAll('.pdf-page').forEach(function (pg) { if (pg.querySelector('.textLayer')) paintInserts(side, docId, pg, +pg.dataset.n); });
-    });
-  }
-  function repaintInsertsShown() {
-    var COL = SW.pair && SW.pair.col; if (!COL) return;
-    ['left', 'right'].forEach(function (s) { if (COL[s] && COL[s].docId) repaintInsertsDoc(COL[s].docId); });
-  }
-
   // ---- drawing the curves across the gutter ----
   function wrapEl() { return document.querySelector('.pair-wrap'); }
   function layer() {
@@ -167,8 +94,7 @@
     while (svg.firstChild) svg.removeChild(svg.firstChild);
     var band = bands();
     function clamp(y, s) { var bd = band[s]; if (!bd) return { y: y, off: false }; if (y < bd.top) return { y: bd.top, off: true }; if (y > bd.bottom) return { y: bd.bottom, off: true }; return { y: y, off: false }; }
-    all().forEach(function (l) {
-      if (l.kind === 'insert') return;                     // an insert is a card, not a curve
+    joins().forEach(function (l) {
       var sa = sideOf(l.a), sb = sideOf(l.b);
       if (!sa || !sb || sa === sb) return;                 // not both shown in opposite columns now
       var leftId = sa === 'left' ? l.a : l.b, rightId = sa === 'left' ? l.b : l.a;
@@ -209,17 +135,13 @@
   function openLink(id, x, y) {
     closeLink();
     var l = get(id); if (!l) return;
-    var isIns = l.kind === 'insert';
     pop = el('div', { class: 'hl-pop judas-pop' });
-    var ends = isIns
-      ? '<div class="hl-quote">' + esc(quoteOf(l.a).slice(0, 200)) + '</div>' +
-        '<div class="judas-join" aria-hidden="true">↳ shown inside ' + esc(insDocLabel(l)) + '</div>'
-      : '<div class="hl-quote">' + esc(quoteOf(l.a).slice(0, 160)) + '</div>' +
+    var ends = '<div class="hl-quote">' + esc(quoteOf(l.a).slice(0, 160)) + '</div>' +
         '<div class="judas-join" aria-hidden="true">⤫ the judas</div>' +
         '<div class="hl-quote">' + esc(quoteOf(l.b).slice(0, 160)) + '</div>';
     pop.innerHTML =
       '<div class="judas-ends">' + ends + '</div>' +
-      '<textarea class="hl-note" rows="2" placeholder="' + (isIns ? 'A note on this insert…' : 'A note on what joins these two passages…') + '">' + esc(l.note || '') + '</textarea>' +
+      '<textarea class="hl-note" rows="2" placeholder="A note on what joins these two passages…">' + esc(l.note || '') + '</textarea>' +
       '<div class="hl-acts"><button class="btn ghost" data-act="delete">Delete</button>' +
       '<span class="hl-by hint">' + esc(l.by || '') + '</span>' +
       '<button class="btn" data-act="done">Done</button></div>';
@@ -227,13 +149,13 @@
     var r = pop.getBoundingClientRect();
     pop.style.left = Math.max(6, Math.min(x, window.innerWidth - r.width - 6)) + 'px';
     pop.style.top = Math.max(6, Math.min(y + 8, window.innerHeight - r.height - 6)) + 'px';
-    function commit() { l.note = pop.querySelector('.hl-note').value; var a = all(), i = a.map(function (z) { return z.id; }).indexOf(l.id); if (i >= 0) { a[i] = l; saveAll(a); } if (isIns) repaintInsertsShown(); }
+    function commit() { l.note = pop.querySelector('.hl-note').value; var a = all(), i = a.map(function (z) { return z.id; }).indexOf(l.id); if (i >= 0) { a[i] = l; saveAll(a); } }
     pop.querySelector('[data-act="done"]').onclick = function () { commit(); closeLink(); };
     pop.querySelector('.hl-note').onchange = commit;
     pop.querySelector('[data-act="delete"]').onclick = function () {
       saveAll(all().filter(function (z) { return z.id !== id; }));
-      closeLink(); scheduleDraw(); repaintInsertsShown();
-      SW.toast(isIns ? 'Insert removed' : 'Judas removed');
+      closeLink(); scheduleDraw();
+      SW.toast('Judas removed');
     };
   }
 
@@ -241,21 +163,18 @@
   SW.on('highlight:editor', function (d) {
     var pop = d.pop, h = d.h;
     var sec = el('div', { class: 'hl-links' });
-    var mine = all().filter(function (l) { return l.a === h.id || l.b === h.id; });
+    var mine = joins().filter(function (l) { return l.a === h.id || l.b === h.id; });
     var listHtml = mine.map(function (l) {
-      if (l.kind === 'insert') {
-        return '<button class="judas-row" data-id="' + esc(l.id) + '" title="Open this insert">↳ shown inside ' + esc(insDocLabel(l)) + (l.note ? ' · <i>noted</i>' : '') + '</button>';
-      }
       var other = l.a === h.id ? l.b : l.a;
       return '<button class="judas-row" data-id="' + esc(l.id) + '" title="Open this judas">⤫ ' + esc(quoteOf(other).slice(0, 48) || 'a passage') + (l.note ? ' · <i>noted</i>' : '') + '</button>';
     }).join('');
     sec.innerHTML = '<div class="judas-btns"><button class="btn judas-start" data-act="join">⤫ Join</button>' +
-      '<button class="btn judas-start" data-act="insert">↳ Insert</button></div>' +
+      '<button class="btn judas-start" data-act="insert" title="A post-it comment beside this passage">✎ Insert</button></div>' +
       (mine.length ? '<div class="judas-list">' + listHtml + '</div>' : '');
     var acts = pop.querySelector('.hl-acts');
     pop.insertBefore(sec, acts);
     sec.querySelector('[data-act="join"]').onclick = function () { startJoin(h.id); };
-    sec.querySelector('[data-act="insert"]').onclick = function () { startInsert(h.id); };
+    sec.querySelector('[data-act="insert"]').onclick = function () { if (SW.postits) SW.postits.addFor(h.id); };
     sec.querySelectorAll('.judas-row').forEach(function (b) {
       b.onclick = function () { var rc = b.getBoundingClientRect(); H().closeEditor(); openLink(b.dataset.id, rc.left, rc.bottom); };
     });
@@ -279,7 +198,7 @@
     var sess = SW.PROGRAMME && SW.PROGRAMME.session(SW.pair.state.session);
     var pool = (sess && sess.pool) || [];
     var out = [];
-    all().forEach(function (l) {
+    joins().forEach(function (l) {
       var ds = linkDocs(l), da = ds[0], db = ds[1]; if (!da || !db) return;
       var aShown = shown.indexOf(da) >= 0, bShown = shown.indexOf(db) >= 0;
       if (aShown === bShown) return;                       // need exactly one end shown
@@ -332,10 +251,10 @@
   }
 
   // ---- redraw and refresh on the reader's events ----
-  SW.on('pair:page', function (d) { scheduleDraw(); if (d && d.pageEl) paintInserts(d.side, d.docId, d.pageEl, d.n); });
-  SW.on('pair:open', function () { cancelJoin(); cancelInsert(); scheduleDraw(); updateMargin(); repaintInsertsShown(); });
-  SW.on('highlights:changed', function () { scheduleDraw(); updateMargin(); repaintInsertsShown(); });
-  SW.on('links:changed', function () { scheduleDraw(); updateMargin(); repaintInsertsShown(); });
+  SW.on('pair:page', scheduleDraw);
+  SW.on('pair:open', function () { cancelJoin(); scheduleDraw(); updateMargin(); });
+  SW.on('highlights:changed', function () { scheduleDraw(); updateMargin(); });
+  SW.on('links:changed', function () { scheduleDraw(); updateMargin(); });
   SW.on('highlight:removed', function (id) {
     var a = all(), n = a.filter(function (l) { return l.a !== id && l.b !== id; });
     if (n.length !== a.length) saveAll(n);
@@ -347,7 +266,7 @@
     var menu = document.querySelector('.judas-menu');
     if (menu && !ev.target.closest('.judas-menu') && !ev.target.closest('#judas-absent')) menu.remove();
   });
-  document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') { closeLink(); cancelJoin(); cancelInsert(); var m = document.querySelector('.judas-menu'); if (m) m.remove(); } });
+  document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') { closeLink(); cancelJoin(); var m = document.querySelector('.judas-menu'); if (m) m.remove(); } });
 
-  SW.links = { all: all, get: get, claimClick: claimClick, startJoin: startJoin, startInsert: startInsert, draw: scheduleDraw, openLink: openLink };
+  SW.links = { all: all, get: get, claimClick: claimClick, startJoin: startJoin, draw: scheduleDraw, openLink: openLink };
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -1,7 +1,7 @@
 /*
  * textsize.js - the kit's code size, given a meaning in Glas. Glas shows no code listings, so the
  * size set in Settings (and by A− and A+ in the top bar) becomes the size of the bench's own text
- * laid over the documents: insert cards, the highlight and judas editors, the list of links
+ * laid over the documents: post-its, the highlight and judas editors, the list of links
  * elsewhere (css/research.css, var(--code-size)). The documents themselves are enlarged with
  * each column's − and +.
  *
@@ -20,7 +20,7 @@
     if (h) {
       h.textContent = 'Text over the documents';
       var p = h.nextElementSibling;
-      if (p && p.classList.contains('hint')) p.textContent = 'The size of the bench’s own text laid over the documents: insert cards, the highlight and judas editors, the list of links elsewhere. The A− and A+ buttons in the top bar change it too. To enlarge a document, use its column’s − and +.';
+      if (p && p.classList.contains('hint')) p.textContent = 'The size of the bench’s own text laid over the documents: post-its, the highlight and judas editors, the list of links elsewhere. The A− and A+ buttons in the top bar change it too. To enlarge a document, use its column’s − and +.';
     }
     ['set-font', 'set-noteshade'].forEach(function (id) { var l = labelOf(id); if (l) l.style.display = 'none'; });
     var sl = labelOf('set-size');

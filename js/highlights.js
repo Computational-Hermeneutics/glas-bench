@@ -165,6 +165,25 @@
   }
   function colObj(side) { return SW.pair && SW.pair.col ? SW.pair.col[side] : null; }
 
+  // Keep a selection inside the column (and page) it starts in. Without this, dragging past the end
+  // of the text lets the browser's selection run on through the DOM into the other column. While
+  // selecting, everything but this text layer is unselectable (css: body.hl-selecting), and the
+  // layer gets PDF.js's end-of-content block, which fills the page so a drag into blank margin
+  // stays on it.
+  document.addEventListener('mousedown', function (ev) {
+    var tl = ev.button === 0 && ev.target.closest && ev.target.closest('.pair-col .textLayer');
+    if (!tl) return;
+    if (!tl.querySelector(':scope > .endOfContent')) tl.append(el('div', { class: 'endOfContent' }));
+    tl.classList.add('selecting');
+    document.body.classList.add('hl-selecting');
+  }, true);
+  function endSelecting() {
+    document.body.classList.remove('hl-selecting');
+    document.querySelectorAll('.textLayer.selecting').forEach(function (t) { t.classList.remove('selecting'); });
+  }
+  document.addEventListener('mouseup', function () { setTimeout(endSelecting, 0); }, true);
+  window.addEventListener('blur', endSelecting);
+
   document.addEventListener('mouseup', function (ev) {
     if (ev.target && ev.target.closest && (ev.target.closest('.hl-bar') || ev.target.closest('.hl-pop'))) return;
     var sel = window.getSelection();

@@ -237,19 +237,32 @@ body.judas-linking .hl-rect { outline: 1px dashed var(--amber); }
 .hl-links .judas-btns { display: flex; gap: 6px; }
 .hl-links .judas-btns .judas-start { flex: 1 1 0; width: auto; }
 
-/* the insert: a passage from one column shown as a card at a point in the other */
-body.judas-inserting .textLayer { cursor: copy; }
-.ins-layer { position: absolute; left: 0; top: 0; right: 0; bottom: 0; pointer-events: none; z-index: 3; }
-.ins-card { position: absolute; width: 46%; max-width: 320px; pointer-events: auto; cursor: pointer;
-  background: var(--surface); border: 1px solid var(--amber); border-left-width: 3px; border-radius: 6px;
-  padding: 7px 9px; box-shadow: 0 3px 14px rgba(0,0,0,.5); color: var(--text); font-size: 12.5px; line-height: 1.4; }
-.ins-card:hover { box-shadow: 0 5px 20px rgba(0,0,0,.6); }
-.ins-card .ins-head { color: var(--amber); font-size: 11px; letter-spacing: .3px; margin-bottom: 3px; }
-.ins-card .ins-quote { font-style: italic; color: var(--text-dim); }
-.ins-card .ins-note { margin-top: 5px; padding-top: 5px; border-top: 1px solid var(--line-soft); color: var(--text); }
+/* post-its: comments floating on a page (js/postits.js), pale paper and dark ink in every theme */
+.pit-layer { position: absolute; left: 0; top: 0; right: 0; bottom: 0; pointer-events: none; z-index: 4; }
+.pit { position: absolute; width: calc(var(--code-size, 13px) * 15); pointer-events: auto;
+  background: #fff4bd; color: #2a2414; border-top: 5px solid #d9b84a; border-radius: 2px 2px 4px 4px;
+  box-shadow: 0 2px 4px rgba(0,0,0,.18), 0 8px 18px rgba(0,0,0,.22); font-size: var(--code-size, 13px); line-height: 1.4; }
+.pit.dragging { box-shadow: 0 4px 8px rgba(0,0,0,.2), 0 14px 30px rgba(0,0,0,.3); opacity: .95; }
+.pit-head { display: flex; align-items: center; gap: 6px; padding: 3px 4px 1px 8px; cursor: grab; user-select: none;
+  font-size: 0.78em; color: #6b5d33; touch-action: none; }
+.pit.dragging .pit-head { cursor: grabbing; }
+.pit-by { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pit-x { flex: none; background: none; border: 0; color: #6b5d33; font-size: 1.3em; line-height: 1; cursor: pointer; padding: 0 3px; }
+.pit-x:hover { color: #a1392b; }
+.pit-text { display: block; width: 100%; box-sizing: border-box; border: 0; background: transparent; color: inherit;
+  font: inherit; line-height: inherit; resize: none; padding: 2px 8px 8px; outline: none; overflow: auto; }
+.pit-text::placeholder { color: #9a8c5e; }
+.pit.folded { width: auto; max-width: calc(var(--code-size, 13px) * 15); }
+.pit.folded .pit-text { display: none; }
+.pair-head .pit-add { flex: none; }
 
 /* ---------- text over the documents: sized by the kit's code size (Settings, A− and A+) ---------- */
-.ins-card { font-size: var(--code-size, 13px); }
-.ins-card .ins-head { font-size: 0.85em; }
 .hl-pop, .hl-pop .hl-tags, .hl-pop .hl-note, .hl-pop .btn, .judas-menu, .judas-mrow { font-size: var(--code-size, 13px); }
 .hl-pop .hl-quote, .judas-row { font-size: 0.95em; }
+
+/* selecting text: the selection stays in the text layer it started in (js/highlights.js) */
+body.hl-selecting, body.hl-selecting * { -webkit-user-select: none; user-select: none; }
+body.hl-selecting .textLayer.selecting, body.hl-selecting .textLayer.selecting span { -webkit-user-select: text; user-select: text; }
+.textLayer .endOfContent { display: block; position: absolute; left: 0; top: 100%; right: 0; bottom: 0; z-index: -1;
+  cursor: default; -webkit-user-select: none; user-select: none; }
+.textLayer.selecting .endOfContent { top: 0; }
