@@ -277,3 +277,57 @@ body.hl-selecting .textLayer.selecting, body.hl-selecting .textLayer.selecting s
 .textLayer .endOfContent { display: block; position: absolute; left: 0; top: 100%; right: 0; bottom: 0; z-index: -1;
   cursor: default; -webkit-user-select: none; user-select: none; }
 .textLayer.selecting .endOfContent { top: 0; }
+
+/* a highlight brought into view (from a thread or a link elsewhere) flashes */
+@keyframes hl-flash { 0%, 100% { box-shadow: none; } 30%, 70% { box-shadow: 0 0 0 3px var(--amber); } }
+.hl-rect.flash { animation: hl-flash 1.4s ease 2; }
+
+/* a join in progress: a banner at the foot of the window until it is made or cancelled */
+.judas-banner { position: fixed; z-index: 63; left: 50%; bottom: 18px; transform: translateX(-50%); display: flex; align-items: center; gap: 10px;
+  max-width: min(720px, calc(100vw - 24px)); padding: 7px 8px 7px 14px; background: var(--surface); color: var(--text);
+  border: 1px solid var(--amber); border-radius: 8px; box-shadow: 0 6px 22px rgba(0,0,0,.45); font-size: 13px; }
+.judas-banner .btn { background: transparent; color: var(--text-dim); border: 1px solid var(--line); border-radius: 5px; padding: 3px 9px; cursor: pointer; font: inherit; flex: none; }
+.judas-banner .btn:hover { color: var(--text); border-color: var(--amber); }
+
+/* ---------- threads (Phase 3): a list on the left, the open thread as ordered excerpts ---------- */
+#view-threads.view.on { padding: 0; }
+.thr { display: grid; grid-template-columns: minmax(200px, 270px) minmax(0, 1fr); min-height: calc(100vh - var(--bar-h, 49px)); }
+.thr-list { border-right: 1px solid var(--line); background: var(--bg-2); padding: 12px; display: flex; flex-direction: column; gap: 4px; }
+.thr-list-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.thr-list-head h2 { margin: 0; font-size: 16px; }
+.thr .btn { background: var(--surface-2); color: var(--text); border: 1px solid var(--line); border-radius: 5px; padding: 4px 10px; cursor: pointer; font: inherit; }
+.thr .btn:hover { border-color: var(--amber); }
+.thr .btn.ghost { background: transparent; border-color: transparent; color: var(--text-dim); }
+.thr .btn.ghost:hover { color: var(--red); border-color: var(--red); }
+.thr-item { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; text-align: left; background: transparent; color: var(--text);
+  border: 1px solid transparent; border-radius: 6px; padding: 7px 9px; cursor: pointer; font: inherit; }
+.thr-item:hover { background: var(--surface); }
+.thr-item.on { background: var(--surface); border-color: var(--amber); }
+.thr-body { padding: 16px 22px 40px; max-width: 900px; }
+.thr-meta { display: flex; flex-direction: column; gap: 7px; margin-bottom: 16px; }
+.thr-meta input, .thr-meta textarea, .thr-addrow select { background: var(--pick-bg, rgba(0,0,0,.3)); color: var(--text); border: 1px solid var(--line);
+  border-radius: 5px; padding: 5px 8px; font: inherit; }
+.thr-meta .thr-name { font-size: 18px; font-weight: 600; }
+.thr-meta-acts { display: flex; align-items: center; justify-content: space-between; }
+.thr-xs { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.thr-x { display: grid; grid-template-columns: 26px minmax(0, 1fr) auto; gap: 10px; align-items: start; background: var(--surface);
+  border: 1px solid var(--line-soft); border-radius: 8px; padding: 12px; }
+.thr-n { color: var(--amber); font-weight: 600; text-align: right; }
+.thr-pair blockquote { margin: 0; padding: 2px 0 2px 10px; border-left: 3px solid var(--amber); font-style: italic; color: var(--text); }
+.thr-cite { color: var(--text-faint); font-size: 12px; margin: 3px 0 0 13px; }
+.thr-judas { color: var(--amber); margin: 6px 0 6px 10px; font-size: 13px; }
+.thr-jnote { margin-top: 9px; padding-top: 8px; border-top: 1px solid var(--line-soft); color: var(--text-dim); }
+.thr-acts { display: flex; flex-direction: column; gap: 4px; align-items: stretch; }
+.thr-acts .icon-btn[disabled] { opacity: .35; cursor: default; }
+.thr-addrow { margin-top: 14px; }
+.thr-empty { margin: 8px 0; }
+@media (max-width: 760px) { .thr { grid-template-columns: 1fr; } .thr-list { border-right: 0; border-bottom: 1px solid var(--line); } }
+
+/* in a join's note: the threads it is in */
+.thr-in { margin-bottom: 8px; }
+.thr-in-label { font-size: 0.8em; color: var(--text-faint); margin-bottom: 3px; }
+.thr-chips { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
+.thr-chip { display: inline-flex; align-items: center; gap: 3px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 12px; padding: 1px 4px 1px 9px; font-size: 0.9em; }
+.thr-chip button { background: none; border: 0; color: var(--text-dim); cursor: pointer; font-size: 1.1em; line-height: 1; padding: 0 3px; }
+.thr-chip button:hover { color: var(--red); }
+.thr-add { background: var(--pick-bg, rgba(0,0,0,.3)); color: var(--text); border: 1px solid var(--line); border-radius: 5px; padding: 2px 5px; font: inherit; font-size: 0.9em; }

@@ -154,7 +154,13 @@
         var d = doc(id);
         sel.append(el('option', { value: id }, (d.role === 'technical' ? 'T · ' : 'C · ') + cite(d)));
       });
-      sel.value = ST.side[side] || '';
+      // a document brought in from another session (a join across sessions) is listed too
+      var here = ST.side[side], hd = here && doc(here);
+      if (hd && pool.indexOf(here) < 0) {
+        var from = PROG().sessions.filter(function (x) { return (x.pool || []).indexOf(here) >= 0; })[0];
+        sel.append(el('option', { value: here }, (hd.role === 'technical' ? 'T · ' : 'C · ') + cite(hd) + (from ? ' (from Session ' + from.no + ')' : '')));
+      }
+      sel.value = here || '';
     });
   }
 
@@ -166,6 +172,20 @@
     ST.side.left = op.left; ST.side.right = op.right;
     fillPicks(); saveState();
     open('left', ST.side.left); open('right', ST.side.right);
+  }
+
+  // open a session with a given document in each column (Threads, and joins across sessions use it)
+  function openPair(sid, left, right) {
+    if (sid && PROG().session(sid)) ST.session = sid;
+    if (left && doc(left)) ST.side.left = left;
+    if (right && doc(right)) ST.side.right = right;
+    saveState();
+    if (SW.state.tab !== 'pair') SW.setTab('pair');          // a first visit draws from this state
+    if (!COL.left || !document.contains(COL.left.el)) return;
+    var sel = SW.$('#pair-session'); if (sel) sel.value = ST.session;
+    fillPicks();
+    if (COL.left.docId !== ST.side.left) open('left', ST.side.left);
+    if (COL.right.docId !== ST.side.right) open('right', ST.side.right);
   }
 
   function swap() {
@@ -276,7 +296,7 @@
     }
     build();
     var s = PROG().session(ST.session);
-    if (ST.side.left && ST.side.right && s && s.pool.indexOf(ST.side.left) >= 0 && s.pool.indexOf(ST.side.right) >= 0) {
+    if (s && s.pool.length && doc(ST.side.left) && doc(ST.side.right)) {
       fillPicks(); open('left', ST.side.left); open('right', ST.side.right);
     } else {
       openSession(ST.session);
@@ -285,5 +305,5 @@
   function firstFull() { var s = PROG().sessions.filter(function (x) { return x.pool && x.pool.length; })[0]; return s ? s.id : PROG().sessions[0].id; }
 
   SW.views.pair = { show: show, hide: function () {}, enter: function () {} };
-  SW.pair = { open: open, swap: swap, openSession: openSession, state: ST, col: COL };
+  SW.pair = { open: open, openPair: openPair, swap: swap, openSession: openSession, state: ST, col: COL };
 })(typeof window !== 'undefined' ? window : globalThis);

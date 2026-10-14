@@ -31,6 +31,9 @@
   function H() { return SW.highlights; }
   function COL() { return SW.pair && SW.pair.col; }
   function clamp01(v) { return Math.max(0, Math.min(0.97, v)); }
+  // focus now and again on the next frame: some browsers drop a focus given to an element in the
+  // same frame it is shown, which reads as a lag before the cursor or the keyboard arrives
+  function focusSoon(node) { if (!node) return; node.focus({ preventScroll: true }); requestAnimationFrame(function () { if (document.activeElement !== node && document.contains(node)) node.focus({ preventScroll: true }); }); }
   function snippet(t) { t = String(t || '').replace(/\s+/g, ' ').trim(); return t.length > 22 ? t.slice(0, 21) + '…' : t; }
 
   // ---- painting: each post-it on its page, in a layer above the text ----
@@ -83,7 +86,7 @@
       closeAll(c);
       c.classList.add('open'); c.openedAt = Date.now();
       grow();
-      if (focus) ta.focus({ preventScroll: true });
+      if (focus) focusSoon(ta);
     };
     // fold: save, drop it if empty, and (when accepted) hand the keyboard back to the column
     c.fold = function (giveBack) {
@@ -92,7 +95,7 @@
       c.classList.remove('open');
       if (!ta.value.trim()) { drop(p.id); c.remove(); }
       else showTab();
-      if (giveBack) { var sc = pageEl.closest('.pair-scroll'); if (sc) sc.focus({ preventScroll: true }); }
+      if (giveBack) focusSoon(pageEl.closest('.pair-scroll'));
     };
     ta.addEventListener('keydown', function (ev) {
       if (ev.key === 'Escape' || (ev.key === 'Enter' && (ev.metaKey || ev.ctrlKey))) { ev.preventDefault(); ev.stopPropagation(); c.fold(true); }
@@ -101,7 +104,7 @@
     c.querySelector('.pit-x').onclick = function () {
       if (ta.value.trim() && !window.confirm('Delete this post-it?')) return;
       drop(p.id); c.remove(); SW.toast('Post-it removed');
-      var sc = pageEl.closest('.pair-scroll'); if (sc) sc.focus({ preventScroll: true });
+      focusSoon(pageEl.closest('.pair-scroll'));
     };
     // the reader's clicks inside a post-it go no further (not to the highlight layer)
     ['mousedown', 'mouseup', 'click'].forEach(function (t) { c.addEventListener(t, function (ev) { ev.stopPropagation(); }); });

@@ -295,7 +295,27 @@
   }
   function selectorForRange(pageEl, range) { var tl = layerOf(pageEl); return tl ? selectorFrom(tl, range) : null; }
 
+  // bring a highlight into view in whichever column shows its document, and flash it: its page
+  // first (which renders it), then the passage itself, a third of the way down the column
+  function reveal(hid) {
+    var h = get(hid); if (!h) return;
+    var t0 = Date.now(), toPage = false;
+    (function tryIt() {
+      var C = SW.pair && SW.pair.col;
+      var c = C && ['left', 'right'].map(function (s) { return C[s]; }).filter(function (x) { return x && x.docId === h.doc; })[0];
+      var pg = c && c.pages.querySelector('.pdf-page[data-n="' + (h.page || 1) + '"]');
+      if (!pg) { if (Date.now() - t0 < 8000) setTimeout(tryIt, 150); return; }
+      var sr = c.scroll.getBoundingClientRect();
+      if (!toPage) { c.scroll.scrollTop += pg.getBoundingClientRect().top - sr.top - 12; toPage = true; }
+      var ms = pg.querySelectorAll('.hl-rect[data-id="' + hid + '"]');
+      if (!ms.length) { if (Date.now() - t0 < 8000) setTimeout(tryIt, 150); return; }
+      c.scroll.scrollTop += ms[0].getBoundingClientRect().top - sr.top - sr.height / 3;
+      ms.forEach(function (m) { m.classList.remove('flash'); void m.offsetWidth; m.classList.add('flash'); });
+    })();
+  }
+
   SW.highlights = {
+    reveal: reveal,
     all: all, forDoc: forDoc, get: get, paintPage: paintPage, repaintDoc: repaintDoc,
     colours: COLOURS, paintOf: paintOf, openEditor: openEditor, closeEditor: closeEditor,
     rangeInPage: rangeInPage, selectorForRange: selectorForRange

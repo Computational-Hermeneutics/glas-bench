@@ -2,6 +2,12 @@
 
 Changes to the bench. The bench keeps its own version numbers, raised by 0.0.1 with each change (the `?v=` on every script and stylesheet in `index.html`); this file records the versions published, newest first.
 
+## 0.2.12 (2026-10-14)
+
+- Phase 3 begins: threads. A thread is a named, tagged, ordered set of joins with a note of its own (`js/threads.js`, kept under `glasbench.threads`). A join is added to a thread, or to a new one, from its note (click its curve); a join can be in more than one thread, and a deleted join leaves its threads. A new Threads tab lists the threads; open one and its joins read in order as excerpts, each passage with its document, page and session, to be reordered, annotated, added to or taken out. Open goes to the pair, with both passages brought into view and flashed.
+- Joins across documents and sessions: a join in progress now stays open, with a banner, while the reader changes document or session, and is made with a passage in any other document. "Links elsewhere" lists joins whose other end is in another session, and opens that session with both documents; a column can hold a document from another session, marked as such in its picker.
+- Post-its take focus, and give it back to the column, more reliably.
+
 ## 0.2.11 (2026-10-14)
 
 - Post-its rest folded, as a small tab showing their first words, just above the text they belong to; a click opens one to read or write. Insert places the tab above the start of its passage. An open post-it folds when it is accepted (✓, Esc, or Cmd/Ctrl-Enter), when the reader clicks elsewhere, or when its column is scrolled; accepting saves it and hands the keyboard back to the column. A post-it accepted with nothing written is removed. Tabs and open cards can both be dragged.

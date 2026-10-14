@@ -47,22 +47,30 @@
   }
 
   // ---- making a join ----
-  var pending = null;    // { id, side }
+  // A join in progress stays open while the reader changes document or session, so a passage can
+  // be joined to one in another session; a banner says what is happening, and Esc cancels.
+  var pending = null;    // { id }
   function startJoin(id) {
-    var side = sideOf(id);
-    if (!side) { SW.toast('Open the passage in a column first'); return; }
-    pending = { id: id, side: side };
+    if (!sideOf(id)) { SW.toast('Open the passage in a column first'); return; }
+    pending = { id: id };
     if (H()) H().closeEditor();
     document.body.classList.add('judas-linking');
-    SW.toast('Now click a passage in the ' + (side === 'left' ? 'right' : 'left') + ' column to join them', 4500);
+    var q = quoteOf(id);
+    var ban = document.querySelector('.judas-banner') || el('div', { class: 'judas-banner', role: 'status' });
+    ban.innerHTML = '<span>Joining from “' + esc(q.slice(0, 40)) + (q.length > 40 ? '…' : '') + '”. Click a passage in the other column, or open another document or session first.</span>' +
+      '<button class="btn ghost" data-act="cancel">Cancel</button>';
+    ban.querySelector('[data-act="cancel"]').onclick = function () { cancelJoin(); };
+    document.body.append(ban);
   }
-  function cancelJoin() { pending = null; document.body.classList.remove('judas-linking'); }
+  function cancelJoin() {
+    pending = null; document.body.classList.remove('judas-linking');
+    var ban = document.querySelector('.judas-banner'); if (ban) ban.remove();
+  }
   // highlights.js hands a clicked highlight here first; true means the click was consumed
   function claimClick(id, ev) {
     if (!pending) return false;
     if (id === pending.id) { cancelJoin(); SW.toast('Join cancelled'); return true; }
-    var side = sideOf(id);
-    if (side && side === pending.side) { SW.toast('Pick a passage in the other column'); return true; }
+    if (docOf(id) === docOf(pending.id)) { SW.toast('Pick a passage in another document'); return true; }
     var link = { id: uid(), a: pending.id, b: id, kind: 'join', note: '', by: by(), created: new Date().toISOString() };
     var a = all(); a.push(link); saveAll(a);
     cancelJoin();
@@ -146,6 +154,7 @@
       '<span class="hl-by hint">' + esc(l.by || '') + '</span>' +
       '<button class="btn" data-act="done">Done</button></div>';
     document.body.append(pop);
+    SW.emit('link:editor', { pop: pop, l: l });   // threads.js adds the join's threads
     var r = pop.getBoundingClientRect();
     pop.style.left = Math.max(6, Math.min(x, window.innerWidth - r.width - 6)) + 'px';
     pop.style.top = Math.max(6, Math.min(y + 8, window.innerHeight - r.height - 6)) + 'px';
@@ -203,9 +212,14 @@
       var aShown = shown.indexOf(da) >= 0, bShown = shown.indexOf(db) >= 0;
       if (aShown === bShown) return;                       // need exactly one end shown
       var shownDoc = aShown ? da : db, hiddenDoc = aShown ? db : da;
-      if (pool.indexOf(hiddenDoc) < 0) return;             // only swappable (same session) for now
-      var shownHid = docOf(l.a) === shownDoc ? l.a : (l.b || l.a);
-      out.push({ link: l, shownDoc: shownDoc, hiddenDoc: hiddenDoc, shownHid: shownHid });
+      // in this session's pool it is swapped in; otherwise the first session that holds it is opened
+      var sid = null;
+      if (pool.indexOf(hiddenDoc) < 0) {
+        var s2 = SW.PROGRAMME.sessions.filter(function (x) { return (x.pool || []).indexOf(hiddenDoc) >= 0; })[0];
+        sid = s2 ? s2.id : SW.pair.state.session;
+      }
+      var shownHid = docOf(l.a) === shownDoc ? l.a : (l.b || l.a), hiddenHid = shownHid === l.a ? l.b : l.a;
+      out.push({ link: l, shownDoc: shownDoc, hiddenDoc: hiddenDoc, shownHid: shownHid, hiddenHid: hiddenHid, sid: sid });
     });
     return out;
   }
@@ -231,9 +245,10 @@
       var hd = SW.PROGRAMME.doc(x.hiddenDoc);
       var who = hd && hd.short ? hd.short : x.hiddenDoc;
       var snippet = x.link.note || quoteOf(x.shownHid);
-      return '<button class="judas-mrow" data-i="' + i + '">Swap in <b>' + esc(who) + '</b>' +
+      var s2 = x.sid && SW.PROGRAMME.session(x.sid);
+      return '<button class="judas-mrow" data-i="' + i + '">' + (s2 ? 'Open' : 'Swap in') + ' <b>' + esc(who) + '</b>' + (s2 ? ' (Session ' + s2.no + ')' : '') +
         (snippet ? '<span class="hint"> · ' + esc(snippet.slice(0, 40)) + '</span>' : '') + '</button>';
-    }).join('') : '<p class="hint" style="padding:6px 8px">No links to other documents in this session.</p>';
+    }).join('') : '<p class="hint" style="padding:6px 8px">No joins to documents not now shown.</p>';
     document.body.append(menu);
     var r = btn.getBoundingClientRect();
     menu.style.left = Math.min(r.left, window.innerWidth - menu.getBoundingClientRect().width - 6) + 'px';
@@ -244,15 +259,17 @@
         var COL = SW.pair.col;
         var partnerSide = COL.left && COL.left.docId === x.shownDoc ? 'left' : 'right';
         var target = partnerSide === 'left' ? 'right' : 'left';
-        SW.pair.open(target, x.hiddenDoc);
+        if (x.sid) SW.pair.openPair(x.sid, target === 'left' ? x.hiddenDoc : x.shownDoc, target === 'right' ? x.hiddenDoc : x.shownDoc);
+        else SW.pair.open(target, x.hiddenDoc);
         menu.remove();
+        if (H().reveal) H().reveal(x.hiddenHid);
       };
     });
   }
 
   // ---- redraw and refresh on the reader's events ----
   SW.on('pair:page', scheduleDraw);
-  SW.on('pair:open', function () { cancelJoin(); scheduleDraw(); updateMargin(); });
+  SW.on('pair:open', function () { scheduleDraw(); updateMargin(); });
   SW.on('highlights:changed', function () { scheduleDraw(); updateMargin(); });
   SW.on('links:changed', function () { scheduleDraw(); updateMargin(); });
   SW.on('highlight:removed', function (id) {
@@ -268,5 +285,5 @@
   });
   document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') { closeLink(); cancelJoin(); var m = document.querySelector('.judas-menu'); if (m) m.remove(); } });
 
-  SW.links = { all: all, get: get, claimClick: claimClick, startJoin: startJoin, draw: scheduleDraw, openLink: openLink };
+  SW.links = { all: all, joins: joins, quoteOf: quoteOf, inkOf: inkOf, get: get, claimClick: claimClick, startJoin: startJoin, draw: scheduleDraw, openLink: openLink };
 })(typeof window !== 'undefined' ? window : globalThis);
