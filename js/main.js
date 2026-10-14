@@ -9,8 +9,8 @@
   root.SW.BENCH.shell = {
     // Pair is Glas's main view (two documents side by side). Read is kept for one document on
     // its own. The genealogy half (Text/analyse, Functional, Compare, Genealogy) is switched
-    // off. Threads (js/threads.js) follows Pair; Sessions is added next; About is reached through Help.
-    views: ['pair', 'threads', 'read', 'about', 'findings', 'notes', 'paratexts'],
+    // off. Threads (js/threads.js) and Sessions (js/sessions.js) follow Pair; About is reached through Help.
+    views: ['pair', 'threads', 'sessions', 'read', 'about', 'findings', 'notes', 'paratexts'],
     // open on the Pair view unless a link asks for another tab
     query: function (q) { if (!q.tab) q.tab = 'pair'; }
   };

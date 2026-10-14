@@ -116,8 +116,82 @@
       SW.store.set(SEL, create(n.trim()).id); show();
     };
     list.querySelectorAll('.thr-item').forEach(function (b) { b.onclick = function () { SW.store.set(SEL, b.dataset.id); show(); }; });
-    if (sel) drawThread(body, sel);
-    else body.innerHTML = '<div class="pad hint">A thread gathers joins across the gutter, in any session, under a name, to be read in order as a sequence of excerpts.</div>';
+    // List or Graph; the graph shows the open thread, or every join
+    var mode = SW.store.get('threads.mode', 'list'), every = !!SW.store.get('threads.graphAll', false) || !sel;
+    var bar = el('div', { class: 'thr-mode' },
+      '<span class="thr-seg"><button data-m="list"' + (mode === 'list' ? ' class="on"' : '') + '>List</button><button data-m="graph"' + (mode === 'graph' ? ' class="on"' : '') + '>Graph</button></span>' +
+      (mode === 'graph' && sel ? '<label class="thr-every"><input type="checkbox"' + (every ? ' checked' : '') + '> All joins</label>' : ''));
+    var inner = el('div', { class: 'thr-inner' });
+    body.append(bar, inner);
+    bar.querySelectorAll('[data-m]').forEach(function (b) { b.onclick = function () { SW.store.set('threads.mode', b.dataset.m); show(); }; });
+    var ev = bar.querySelector('.thr-every input'); if (ev) ev.onchange = function () { SW.store.set('threads.graphAll', ev.checked); show(); };
+    if (mode === 'graph') drawGraph(inner, every ? null : sel);
+    else if (sel) drawThread(inner, sel);
+    else inner.innerHTML = '<div class="pad hint">A thread gathers joins across the gutter, in any session, under a name, to be read in order as a sequence of excerpts.</div>';
+  }
+
+  // ---- the graph: sessions as bands, technical documents on the left and critical on the right,
+  //      joins as curves across the middle, numbered in the thread's order ----
+  var NS = 'http://www.w3.org/2000/svg';
+  function drawGraph(host, t) {
+    var joins = L() ? L().joins() : [], byId = {};
+    joins.forEach(function (l) { byId[l.id] = l; });
+    var ids = (t ? t.links : joins.map(function (l) { return l.id; })).filter(function (id) { var l = byId[id]; return l && H().get(l.a) && H().get(l.b); });
+    if (!ids.length) { host.innerHTML = '<p class="hint thr-empty">' + (t ? 'No joins in this thread yet.' : 'No joins yet.') + '</p>'; return; }
+    // the documents each join touches, placed in the session that holds them
+    var rows = {}, order = [];
+    function place(docId) {
+      var s = sessionWith(docId), sid = s ? s.id : '_', d = P().doc(docId);
+      if (!rows[sid]) { rows[sid] = { s: s, left: [], right: [] }; order.push(sid); }
+      var lane = d && d.role === 'critical' ? 'right' : 'left';
+      if (rows[sid][lane].indexOf(docId) < 0) rows[sid][lane].push(docId);
+      return { sid: sid, lane: lane };
+    }
+    var edges = ids.map(function (id, i) { var l = byId[id]; return { l: l, n: i + 1, a: place(H().get(l.a).doc), b: place(H().get(l.b).doc), da: H().get(l.a).doc, db: H().get(l.b).doc }; });
+    order.sort(function (x, y) { return (rows[x].s ? rows[x].s.no : 99) - (rows[y].s ? rows[y].s.no : 99); });
+    // layout
+    var W = Math.max(520, Math.min(host.clientWidth || 860, 900)), NW = Math.min(220, W * 0.3), NH = 34, GAP = 14, PAD = 30, y = 0, pos = {};
+    order.forEach(function (sid) {
+      var r = rows[sid], n = Math.max(r.left.length, r.right.length, 1);
+      r.top = y; r.h = PAD + n * (NH + GAP) + 6;
+      ['left', 'right'].forEach(function (lane) {
+        r[lane].forEach(function (docId, i) { pos[sid + '|' + docId] = { x: lane === 'left' ? 8 : W - NW - 8, y: y + PAD + i * (NH + GAP), lane: lane, sid: sid, doc: docId }; });
+      });
+      y += r.h;
+    });
+    var svg = document.createElementNS(NS, 'svg');
+    svg.setAttribute('class', 'thr-graph'); svg.setAttribute('width', W); svg.setAttribute('height', y + 4); svg.setAttribute('viewBox', '0 0 ' + W + ' ' + (y + 4));
+    var out = '';
+    order.forEach(function (sid, i) {
+      var r = rows[sid];
+      out += '<rect class="tg-band' + (i % 2 ? ' odd' : '') + '" x="0" y="' + r.top + '" width="' + W + '" height="' + r.h + '"/>' +
+        '<text class="tg-session" x="10" y="' + (r.top + 18) + '">' + esc(r.s ? 'Session ' + r.s.no + ' · ' + SW.fmtDate(r.s.date) : 'Not in a session') + '</text>';
+    });
+    // edges, spread when several join the same two documents
+    var seen = {};
+    edges.forEach(function (e) {
+      var A = pos[e.a.sid + '|' + e.da], B = pos[e.b.sid + '|' + e.db]; if (!A || !B) return;
+      if (A.lane === 'right' && B.lane === 'left') { var t0 = A; A = B; B = t0; }
+      var key = [A.sid + A.doc, B.sid + B.doc].sort().join('~'), k = seen[key] = (seen[key] || 0) + 1, off = ((k % 2 ? 1 : -1) * Math.floor(k / 2)) * 6;
+      var x1, y1 = A.y + NH / 2 + off, x2, y2 = B.y + NH / 2 + off, d;
+      if (A.lane !== B.lane) { x1 = A.x + NW; x2 = B.x; var mx = (x1 + x2) / 2; d = 'M' + x1 + ' ' + y1 + ' C' + mx + ' ' + y1 + ' ' + mx + ' ' + y2 + ' ' + x2 + ' ' + y2; }
+      else { var side = A.lane === 'left', bx = side ? A.x + NW : A.x, bulge = side ? 70 + 10 * k : -70 - 10 * k; x1 = bx; x2 = bx; d = 'M' + x1 + ' ' + y1 + ' C' + (x1 + bulge) + ' ' + y1 + ' ' + (x2 + bulge) + ' ' + y2 + ' ' + x2 + ' ' + y2; }
+      var ink = L().inkOf(e.l.a), mxp = A.lane !== B.lane ? (x1 + x2) / 2 : x1 + (A.lane === 'left' ? 52 + 7.5 * k : -52 - 7.5 * k), myp = (y1 + y2) / 2;
+      out += '<g class="tg-edge" data-id="' + esc(e.l.id) + '"><title>' + esc(e.n + '. ' + L().quoteOf(e.l.a).slice(0, 60) + ' ⤫ ' + L().quoteOf(e.l.b).slice(0, 60) + (e.l.note ? ' (' + e.l.note + ')' : '')) + '</title>' +
+        '<path class="tg-hit" d="' + d + '"/><path class="tg-line" d="' + d + '" style="stroke:' + ink + '"/>' +
+        '<circle class="tg-num" cx="' + mxp + '" cy="' + myp + '" r="9" style="stroke:' + ink + '"/><text class="tg-numt" x="' + mxp + '" y="' + (myp + 3.5) + '">' + e.n + '</text></g>';
+    });
+    Object.keys(pos).forEach(function (k) {
+      var q = pos[k], d = P().doc(q.doc), lab = d && d.short ? d.short : q.doc;
+      out += '<g class="tg-node ' + q.lane + '" data-sid="' + esc(q.sid) + '" data-doc="' + esc(q.doc) + '"><title>' + esc((d && d.csl && d.csl.title) || lab) + '</title>' +
+        '<rect x="' + q.x + '" y="' + q.y + '" width="' + NW + '" height="' + NH + '" rx="5"/>' +
+        '<text x="' + (q.x + 10) + '" y="' + (q.y + NH / 2 + 4) + '">' + esc(lab) + '</text></g>';
+    });
+    svg.innerHTML = out;
+    host.innerHTML = '<p class="hint thr-ghint">' + (t ? 'The thread “' + esc(t.name) + '”' : 'Every join') + ': technical documents on the left, critical on the right, a band for each session. Click a curve to open that join, a document to open it.</p>';
+    host.append(svg);
+    svg.querySelectorAll('.tg-edge').forEach(function (g) { g.onclick = function () { openJoin(g.dataset.id); }; });
+    svg.querySelectorAll('.tg-node').forEach(function (g) { g.onclick = function () { if (SW.sessions) SW.sessions.openIn(g.dataset.sid === '_' ? null : g.dataset.sid, g.dataset.doc); }; });
   }
 
   function drawThread(body, t) {

@@ -34,8 +34,13 @@ hermeneutic tools. Finish Phase 3 here, then extract the reusable modules into h
 the submodule. (The bench already sits at the repo root, since 0.2.5.) See PLAN.md, Direction. Note: a
 cloud session needs the Claude GitHub App installed on hermes-kit to push to it.
 
-Not yet built (next): threads and cross-session links, the Sessions and Threads views, search,
-exports and the Glas print view. See **What is next** below.
+- **Phase 3 (threads and cross-session links): done** (0.2.12 to 0.2.14). `js/threads.js`: named,
+  tagged, ordered sets of joins, a Threads tab with a list and a graph; `js/sessions.js`: the
+  Sessions tab; a join in progress stays open across a change of document or session. Also:
+  post-its (`js/postits.js`, folded tabs over the text), long documents release far-off pages.
+
+Not yet built (next): extract hermes-kit (see PLAN.md, Direction); then Phase 4, export, search,
+sharing and the Glas print view. See **What is next** below.
 
 **Verifying headless in a cloud session:** serve from the repo root. The cloud
 network policy blocks cdnjs, so feed Playwright the PDF.js 3.11.174 build from npm

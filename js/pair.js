@@ -34,6 +34,7 @@
   // the author line and year, short, from CSL
   function cite(d) {
     if (!d) return '';
+    if (d.short) return d.short;                         // the document's own short label (programme.js)
     var c = d.csl || {}, a = (c.author || [])[0], who = a ? (a.literal || a.family || '') : '';
     var yr = c.issued && c.issued['date-parts'] ? c.issued['date-parts'][0][0] : '';
     return [who + (c.author && c.author.length > 1 ? ' et al.' : ''), yr].filter(Boolean).join(' ');

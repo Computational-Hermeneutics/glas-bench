@@ -2,6 +2,11 @@
 
 Changes to the bench. The bench keeps its own version numbers, raised by 0.0.1 with each change (the `?v=` on every script and stylesheet in `index.html`); this file records the versions published, newest first.
 
+## 0.2.14 (2026-10-14)
+
+- Phase 3 complete. A Sessions tab shows the programme session by session: each session's date and documents, technical and critical, with the highlights and post-its made on each, the joins made within the session and those reaching other sessions, and the threads that pass through it; Read opens the session, and a document opens in its column (`js/sessions.js`). The Threads tab gains a graph beside its list: a band for each session, technical documents on the left and critical on the right, joins as curves across the middle numbered in the thread's order, for the open thread or for every join; a curve opens its join, a document opens it.
+- Documents are labelled by their short form throughout (Benjamin & Lacis 1925, not Benjamin et al.).
+
 ## 0.2.13 (2026-10-14)
 
 - Fixed: the reader grew sticky on a long document. Every page ever drawn kept its canvas and text layer (all 63 pages of Song et al., some 570 MB at a Retina screen's resolution), and keeping a selection in its column restyled the whole page at the start and end of every drag (350 to 540 ms each). Pages more than a couple of screens away now give up their canvas and text layer and are drawn again, with their highlights and post-its, when scrolled back to (Song now holds about four pages, 36 MB); and a selection that wanders out of its page is held at the page's start or end instead, with nothing restyled beyond the one page.

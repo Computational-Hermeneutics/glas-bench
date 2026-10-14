@@ -329,3 +329,52 @@ body.judas-linking .hl-rect { outline: 1px dashed var(--amber); }
 .thr-chip button { background: none; border: 0; color: var(--text-dim); cursor: pointer; font-size: 1.1em; line-height: 1; padding: 0 3px; }
 .thr-chip button:hover { color: var(--red); }
 .thr-add { background: var(--pick-bg, rgba(0,0,0,.3)); color: var(--text); border: 1px solid var(--line); border-radius: 5px; padding: 2px 5px; font: inherit; font-size: 0.9em; }
+
+/* ---------- the Sessions view (Phase 3) ---------- */
+#view-sessions.view.on { padding: 0; }
+.ses { max-width: 980px; padding: 18px 22px 40px; }
+.ses-head h2 { margin: 0 0 4px; font-size: 18px; }
+.ses-list { list-style: none; margin: 16px 0 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.ses-item { display: grid; grid-template-columns: 130px minmax(0, 1fr); gap: 6px 16px; background: var(--surface); border: 1px solid var(--line-soft); border-radius: 8px; padding: 12px 14px; }
+.ses-item.on { border-color: var(--amber); }
+.ses-item.empty { background: transparent; padding-top: 8px; padding-bottom: 8px; }
+.ses-when { display: flex; flex-direction: column; gap: 2px; align-items: flex-start; }
+.ses-when b { color: var(--amber); }
+.ses-when span { color: var(--text-dim); font-size: 13px; }
+.ses-when .btn { margin-top: 6px; background: var(--surface-2); color: var(--text); border: 1px solid var(--line); border-radius: 5px; padding: 3px 12px; cursor: pointer; font: inherit; }
+.ses-when .btn:hover { border-color: var(--amber); }
+.ses-docs { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
+.ses-role-h { font-size: 11px; letter-spacing: .8px; text-transform: uppercase; color: var(--text-faint); margin-bottom: 4px; }
+.ses-doc { display: flex; flex-direction: column; align-items: flex-start; gap: 1px; width: 100%; text-align: left; background: transparent; color: var(--text);
+  border: 1px solid transparent; border-radius: 6px; padding: 5px 8px; cursor: pointer; font: inherit; }
+.ses-doc:hover { background: var(--surface-2); border-color: var(--line); }
+.ses-cite { font-weight: 600; }
+.ses-title { color: var(--text-dim); font-size: 13px; font-style: italic; }
+.ses-made { color: var(--amber); font-size: 12px; }
+.ses-work { grid-column: 2; font-size: 13px; }
+.ses-work a { color: var(--amber); }
+@media (max-width: 700px) { .ses-item { grid-template-columns: 1fr; } .ses-work { grid-column: 1; } }
+
+/* the Threads view's List | Graph switch, and the graph */
+.thr-mode { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+.thr-seg { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+.thr-seg button { background: transparent; color: var(--text-dim); border: 0; padding: 4px 14px; cursor: pointer; font: inherit; }
+.thr-seg button.on { background: var(--surface-2); color: var(--text); box-shadow: inset 0 -2px 0 var(--amber); }
+.thr-every { color: var(--text-dim); font-size: 13px; display: inline-flex; gap: 5px; align-items: center; }
+.thr-ghint { margin: 0 0 10px; }
+svg.thr-graph { display: block; max-width: 100%; }
+.tg-band { fill: var(--surface); }
+.tg-band.odd { fill: var(--bg-2); }
+.tg-session { fill: var(--text-faint); font-size: 11.5px; letter-spacing: .4px; }
+.tg-node { cursor: pointer; }
+.tg-node rect { fill: var(--surface-2); stroke: var(--line); }
+.tg-node.right rect { stroke-dasharray: none; }
+.tg-node:hover rect { stroke: var(--amber); }
+.tg-node text { fill: var(--text); font-size: 13px; }
+.tg-edge { cursor: pointer; }
+.tg-line { fill: none; stroke-width: 2; opacity: .9; }
+.tg-hit { fill: none; stroke: transparent; stroke-width: 14; }
+.tg-edge:hover .tg-line { stroke-width: 3; opacity: 1; }
+.tg-num { fill: var(--surface); stroke-width: 1.5; }
+.tg-numt { fill: var(--text); font-size: 10.5px; text-anchor: middle; font-weight: 600; }
+svg.thr-graph text { font-family: var(--sans); }
