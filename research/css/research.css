@@ -1,0 +1,73 @@
+/* ============================================================
+   Example research bench
+   The bench's default colours: the custom properties below. The
+   colour themes chosen in ⚙ Settings are bench-kit's
+   kit/themes.css, and the styles every bench shares its
+   kit/bench.css, both loaded before this file; to change a theme,
+   repeat its selector here with the tokens to change.
+   ============================================================ */
+
+:root {
+  --code-bg: #0c0e13;   /* the ground of code: listings, diffs */
+  --noted-bg: rgba(229, 139, 224, 0.07);
+  --bg: #11131a;
+  --bg-2: #171a23;
+  --surface: #1a1d27;
+  --surface-2: #20242f;
+  --line: #2f333d;
+  --line-soft: #23262f;
+  --text: #e7e4da;
+  --text-dim: #a2a59c;
+  --text-faint: #767970;
+  --beam: #6fdc8c;
+  /* the bench's accent (annotations, titles, numbers, the current line): kept off yellow,
+     so that gold (--kin) stands apart */
+  --amber: #e58be0;
+  --green: #57b86b;
+  --red: #e25141;
+  --violet: #4d92e0;
+  --hl: rgba(229, 139, 224, 0.14);
+  --sel: rgba(87, 192, 138, 0.15);
+  --add-bg: rgba(87, 184, 107, 0.13);
+  --del-bg: rgba(226, 81, 65, 0.13);
+  --dec-blue: #3aa862;
+  --dec-blue-dark: #1d3a27;
+  --dec-cream: #e7e4da;
+  --g-retained: #57c08a;
+  --g-moved: #4d92e0;
+  --g-edited: #f2ab3c;
+  --g-rewritten: #e2803c;
+  --g-added: #a8e6b8;
+  --g-removed: #e25141;
+  --g-text: #e7e4da; --g-muted: #8a8d86; --g-stroke: #3a3f4a; --g-box: #1a1d27; --g-heat: #57c08a; --g-line: #a2a59c; --g-cell-dark: #0c0e13;
+  /* the frame: top bar, version picker, figure plates */
+  --bar-1: #171a23; --bar-2: #11131a; --bar-fg: #e7e4da; --bar-line: #0a0b0f;
+  --pick-bg: rgba(0, 0, 0, 0.3); --pick-fg: #e7e4da; --pick-line: rgba(231, 228, 218, 0.22);
+  --plate: #0c0e13; --plate-line: #23262f; --pick-stroke: #e7e4da; --hl-filter: brightness(1.45);
+  --on-amber: #1a0019; --tape-paper: #e7e4da; --tape-hole: #11131a;
+  color-scheme: dark;
+}
+
+h2 .swref { font-size: 11.5px; vertical-align: middle; }
+
+/* ---------- the welcome tour ---------- */
+
+@media (max-width: 640px) { .tab-menu[data-w="graphics"] { grid-template-columns: 1fr; } }
+
+/* assembly errors, explained */
+button.badge.err { cursor: pointer; font: inherit; }
+
+.mc-where button:focus-visible, .frag-q button:focus-visible, .card-fold:focus-visible, .lncols .ann-cyc:focus-visible { outline: 2px solid var(--beam); outline-offset: 1px; border-radius: 2px; }
+
+.legend span[title] { cursor: help; }
+
+/* ---------- top bar ---------- */
+.brand-name { display: inline-flex; flex-direction: column; gap: 3px; }
+
+.brand-name b { margin-left: 0; }
+.bar-right { margin-left: auto; }
+
+/* ---------- the language, beside the picker ---------- */
+.vlang { font: 10px var(--mono); letter-spacing: 0.5px; color: var(--text-faint); margin-left: 8px; white-space: nowrap; }
+@media (max-width: 900px) { .vlang { display: none; } }
+

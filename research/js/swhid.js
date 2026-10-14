@@ -1,0 +1,3 @@
+/* SWHIDs (git blob hashes) of the files under source/, with the commit that last changed each,
+ * for citations and permalinks. Made by tools/swhid.sh; run it again when the sources change. */
+(function (root) { root.SW.SWHID = {"v1/README.txt": ["f3640b4b1bc750927c513102a63628280537e005", "80c35f1ce100fc8b28880ddf3ef28e46aaa330d8"], "v1/wordfreq.py": ["cdb589b8790b170a150192715da23bba592b181b", "80c35f1ce100fc8b28880ddf3ef28e46aaa330d8"], "v2/README.txt": ["16ec8da8872f05282ec63a207c8365e5e64014e4", "80c35f1ce100fc8b28880ddf3ef28e46aaa330d8"], "v2/textutil.py": ["9c3c4f67a6f154e370fdec22bbfb423f9b66ff85", "80c35f1ce100fc8b28880ddf3ef28e46aaa330d8"], "v2/wordfreq.py": ["7d14e07ea1523161a6366c134f3ef176df537f1e", "80c35f1ce100fc8b28880ddf3ef28e46aaa330d8"]}; })(this);
