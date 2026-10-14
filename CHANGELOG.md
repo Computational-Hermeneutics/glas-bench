@@ -2,6 +2,10 @@
 
 Changes to the bench. The bench keeps its own version numbers, raised by 0.0.1 with each change (the `?v=` on every script and stylesheet in `index.html`); this file records the versions published, newest first.
 
+## 0.2.11 (2026-10-14)
+
+- Post-its rest folded, as a small tab showing their first words, just above the text they belong to; a click opens one to read or write. Insert places the tab above the start of its passage. An open post-it folds when it is accepted (✓, Esc, or Cmd/Ctrl-Enter), when the reader clicks elsewhere, or when its column is scrolled; accepting saves it and hands the keyboard back to the column. A post-it accepted with nothing written is removed. Tabs and open cards can both be dragged.
+
 ## 0.2.10 (2026-10-14)
 
 - The Pair view's hint says what can now be done: highlight, join, post-its.
