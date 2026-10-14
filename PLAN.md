@@ -4,6 +4,18 @@
 **Status:** approved 2026-10-14. Phase 0 done; Phase 1 (two-column Pair reader) working. See HANDOFF.md.
 **Built on:** bench-kit 0.60.0, from bench-template 0.1.82
 
+## Direction (decided 2026-10-14): hermes-kit
+
+Glas Bench is the first instance of a new kit, **hermes-kit** (`Computational-Hermeneutics/hermes-kit`), for building comparative hermeneutic tools. It stands fully alone and is a sibling to bench-kit, not a fork of it: bench-kit serves the study of one program through its versions (genealogy, descent, variorum, SWHIDs), which Glas has switched off entirely.
+
+- **Into hermes-kit:** the two-column reader (`pair.js`), quote-selector anchoring (`highlights.js`), the judas, join and insert (`links.js`), threads, the programme and session navigator, the paratext layer (a private text archive read by token), export and the Glas print view, and the frame these need (shell, store, themes, settings).
+- **Stays in a bench:** its programme data (`programme.js`), its identity and theme (`config.js`), its worked example.
+- **Excluded:** the whole descent half of bench-kit.
+
+Order: prototype in this bench until the interpretive set is complete (Phase 3, threads, is the last piece), then extract hermes-kit from the working whole. At that point glas-bench takes hermes-kit as its submodule in place of bench-kit, drops the `research/` folder, and is served at the repo root, `https://computational-hermeneutics.github.io/glas-bench/`. Section 4 below (kit-first into bench-kit) is superseded by this.
+
+---
+
 Glas Bench reads two documents side by side in two columns of equal standing, after Derrida's *Glas* (1974). Its case is a technical AI document set beside a text from the critical tradition, read against each other. Links across the gutter, which Derrida calls *judas*, are the main data. It is a static site on GitHub Pages, built on bench-kit, with no build step.
 
 ## 1. What transfers from the kit, and what switches off

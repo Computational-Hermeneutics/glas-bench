@@ -21,8 +21,25 @@ against each other. Links across the gutter (the *judas*) are the main data. Bui
   against Sohn-Rethel (critical, right); the other two critical texts swap into the right column.
   Verified: 8 canvases rendered, 661 text spans, text layer selectable.
 
-Not yet built (next): highlights, the judas links across the gutter, threads, the Sessions and
-Threads views, search, exports and the Glas print view. See **What is next** below.
+- **Phase 2 (highlights and the judas): done** (0.2.2 to 0.2.4). `js/highlights.js`: select text
+  to highlight it (colour, tags, note), anchored by a W3C TextQuoteSelector with page fallback,
+  keyed to the document, stored under `glasbench.highlights`. `js/links.js`: the judas, a join
+  (two highlights across the gutter, drawn as a curve that tracks scroll and zoom) and an insert
+  (a passage shown as a card at a chosen point in the other column), stored under
+  `glasbench.links`; "Links elsewhere" lists links to documents not shown, with swap-in.
+
+**Direction (2026-10-14): hermes-kit.** Glas is the first instance of a new, fully standalone
+kit, `Computational-Hermeneutics/hermes-kit` (currently empty, GPL-3), for comparative
+hermeneutic tools. Finish Phase 3 here, then extract the reusable modules into hermes-kit, swap
+the submodule, drop `research/` and serve at the repo root. See PLAN.md, Direction. Note: a
+cloud session needs the Claude GitHub App installed on hermes-kit to push to it.
+
+Not yet built (next): threads and cross-session links, the Sessions and Threads views, search,
+exports and the Glas print view. See **What is next** below.
+
+**Verifying headless in a cloud session:** serve from the repo root, not `research/`. The cloud
+network policy blocks cdnjs, so feed Playwright the PDF.js 3.11.174 build from npm
+(`npm pack pdfjs-dist@3.11.174`) by routing the cdnjs URLs to it.
 
 ## Run it
 
