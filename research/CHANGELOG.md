@@ -2,6 +2,10 @@
 
 Changes to the bench (`research/`). The bench keeps its own version numbers, raised by 0.0.1 with each change (the `?v=` on every script and stylesheet in `index.html`); this file records the versions published, newest first.
 
+## 0.2.4 (2026-10-14)
+
+- Phase 2 complete: the judas insert. From a highlighted passage, choose Insert and then a point in the other column, and the passage is shown there as a card anchored at that point, with the source named and a note of its own. The card re-anchors by quoted text when the page is drawn again and moves with the scroll; it is removed from its own card or when its source highlight is deleted. Inserts also appear in the "Links elsewhere" margin list when their other document is not shown. The highlight editor now offers Join and Insert side by side. `js/links.js` gains the insert; `js/highlights.js` exposes the quote-selector anchoring (`rangeInPage`, `selectorForRange`) that both the insert and the joins reuse.
+
 ## 0.2.3 (2026-10-14)
 
 - Phase 2 continues: the judas, links across the gutter. Join a highlighted passage in one column to a highlighted passage in the other, with a note; the link is drawn as a curve across the gutter from one passage to the other, kept aligned as the columns are scrolled and zoomed, and clicking the curve opens its note. A link whose other end is a document not now shown is listed above the columns under "Links elsewhere", a click away from swapping that document into view. A link references two highlights by id, so it holds across a swap and can join passages across sessions; links are kept in this browser under `glasbench.links`, and deleting a highlight removes any judas on it. New bench-only module `js/links.js`, with a Join control and a passage's links added to the highlight editor. The insert variant (a passage shown inside the other column) comes next.

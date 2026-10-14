@@ -267,8 +267,18 @@
   SW.on('pair:page', function (d) { if (d && d.pageEl) paintPage(d.side, d.docId, d.pageEl, d.n); });
   SW.on('pair:open', function () { closeEditor(); hideBar(); });
 
+  // shared anchoring for the link layer: locate a stored selector on a rendered page, and build a
+  // selector from a range on a page (used to place and create the judas insert, links.js)
+  function rangeInPage(pageEl, selector) {
+    var tl = layerOf(pageEl); if (!tl) return null;
+    var loc = locate(tl, selector); if (!loc) return null;
+    return rangeOf(tl, loc.start, loc.end);
+  }
+  function selectorForRange(pageEl, range) { var tl = layerOf(pageEl); return tl ? selectorFrom(tl, range) : null; }
+
   SW.highlights = {
     all: all, forDoc: forDoc, get: get, paintPage: paintPage, repaintDoc: repaintDoc,
-    colours: COLOURS, paintOf: paintOf, openEditor: openEditor, closeEditor: closeEditor
+    colours: COLOURS, paintOf: paintOf, openEditor: openEditor, closeEditor: closeEditor,
+    rangeInPage: rangeInPage, selectorForRange: selectorForRange
   };
 })(typeof window !== 'undefined' ? window : globalThis);

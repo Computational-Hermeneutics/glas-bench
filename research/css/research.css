@@ -198,3 +198,18 @@ body.judas-linking .hl-rect { outline: 1px dashed var(--amber); }
 .judas-mrow { text-align: left; background: transparent; color: var(--text); border: 0; border-radius: 5px;
   padding: 6px 8px; cursor: pointer; font: inherit; }
 .judas-mrow:hover { background: var(--surface-2); }
+
+/* the Join and Insert buttons side by side in the highlight editor */
+.hl-links .judas-btns { display: flex; gap: 6px; }
+.hl-links .judas-btns .judas-start { flex: 1 1 0; width: auto; }
+
+/* the insert: a passage from one column shown as a card at a point in the other */
+body.judas-inserting .textLayer { cursor: copy; }
+.ins-layer { position: absolute; left: 0; top: 0; right: 0; bottom: 0; pointer-events: none; z-index: 3; }
+.ins-card { position: absolute; width: 46%; max-width: 320px; pointer-events: auto; cursor: pointer;
+  background: var(--surface); border: 1px solid var(--amber); border-left-width: 3px; border-radius: 6px;
+  padding: 7px 9px; box-shadow: 0 3px 14px rgba(0,0,0,.5); color: var(--text); font-size: 12.5px; line-height: 1.4; }
+.ins-card:hover { box-shadow: 0 5px 20px rgba(0,0,0,.6); }
+.ins-card .ins-head { color: var(--amber); font-size: 11px; letter-spacing: .3px; margin-bottom: 3px; }
+.ins-card .ins-quote { font-style: italic; color: var(--text-dim); }
+.ins-card .ins-note { margin-top: 5px; padding-top: 5px; border-top: 1px solid var(--line-soft); color: var(--text); }
