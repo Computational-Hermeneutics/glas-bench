@@ -2,6 +2,10 @@
 
 Changes to the bench (`research/`). The bench keeps its own version numbers, raised by 0.0.1 with each change (the `?v=` on every script and stylesheet in `index.html`); this file records the versions published, newest first.
 
+## 0.2.2 (2026-10-14)
+
+- Phase 2 begins: the highlight layer. Select text in either column to highlight it over the PDF text layer, in one of five colours, with tags and a note; a small colour bar is raised on a selection, and clicking a highlight reopens its editor. Each highlight is anchored by a W3C TextQuoteSelector (the quoted text with a little either side as prefix and suffix) and the page number as a fallback, so it re-anchors when a page is drawn again and follows its document from one column to the other. Highlights are keyed to the document and kept in this browser under `glasbench.highlights`; nothing is sent anywhere. New bench-only module `js/highlights.js`, with `js/pair.js` emitting `pair:page` and `pair:open` for it to paint against. The judas links that join two highlights across the gutter come next.
+
 ## 0.2.1 (2026-10-14)
 
 - Phase 1: the Pair view. Two documents side by side, a column each, rendered with PDF.js and a selectable text layer, lazily by page; each column has its own document picker, zoom and scroll; Swap sides. The programme and its sessions are data (`js/programme.js`), with Session 1 built in full (Song et al. against Sohn-Rethel, Benjamin & Lacis, Bloch) and the 14 session dates. A document's PDF is drawn from the paratext library when a token is set, from a copy committed under `research/lib/` otherwise (this private research space holds the shrunk source PDFs), or from an open URL. Pair is the opening view; Read is kept for one document on its own.

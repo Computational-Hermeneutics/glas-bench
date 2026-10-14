@@ -100,7 +100,7 @@
     var bar = el('div', { class: 'pair-bar' },
       '<label class="pair-sesh">Session <select id="pair-session" aria-label="Session"></select></label>' +
       '<button class="btn" id="pair-swap" title="Swap the two columns">⇄ Swap sides</button>' +
-      '<span class="pair-hint hint">Select text in a column to read it. Joining passages across the gutter arrives next.</span>');
+      '<span class="pair-hint hint">Select text in a column to highlight it. Joining passages across the gutter arrives next.</span>');
     var wrap = el('div', { class: 'pair-wrap' });
     var left = columnEl('left'), gutter = el('div', { class: 'pair-gutter', 'aria-hidden': 'true' }), right = columnEl('right');
     wrap.append(left.el, gutter, right.el);
@@ -172,6 +172,7 @@
   function open(side, docId) {
     var o = COL[side], d = doc(docId); if (!d) return;
     ST.side[side] = docId; o.docId = docId; o.pick.value = docId; saveState();
+    SW.emit('pair:open', { side: side, docId: docId });
     if (o.io) { o.io.disconnect(); o.io = null; }
     o.pages.innerHTML = '<div class="pair-load hint">Opening ' + esc(cite(d)) + '…</div>';
     Promise.all([pdfjs(), sources(d)]).then(function (r) {
@@ -252,7 +253,9 @@
         tl.style.width = vp.width + 'px'; tl.style.height = vp.height + 'px';
         tl.style.setProperty('--scale-factor', scale);
         pg.append(tl);
-        root.pdfjsLib.renderTextLayer({ textContentSource: tc, container: tl, viewport: vp, textDivs: [] });
+        var task = root.pdfjsLib.renderTextLayer({ textContentSource: tc, container: tl, viewport: vp, textDivs: [] });
+        var done = task && task.promise ? task.promise : Promise.resolve();
+        done.then(function () { SW.emit('pair:page', { side: o.side, docId: o.docId, pageEl: pg, n: n }); }, function () {});
       });
     });
   }
@@ -276,5 +279,5 @@
   function firstFull() { var s = PROG().sessions.filter(function (x) { return x.pool && x.pool.length; })[0]; return s ? s.id : PROG().sessions[0].id; }
 
   SW.views.pair = { show: show, hide: function () {}, enter: function () {} };
-  SW.pair = { open: open, swap: swap, openSession: openSession, state: ST };
+  SW.pair = { open: open, swap: swap, openSession: openSession, state: ST, col: COL };
 })(typeof window !== 'undefined' ? window : globalThis);
