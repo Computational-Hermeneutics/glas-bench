@@ -160,3 +160,41 @@ header.bar .pick { display: none; }
 .hl-pop .btn:hover { border-color: var(--amber); }
 .hl-pop .btn.ghost { background: transparent; border-color: transparent; color: var(--text-dim); }
 .hl-pop .btn.ghost:hover { color: var(--red); border-color: var(--red); }
+
+/* ---------- the judas (Phase 2): links across the gutter ---------- */
+/* the curves are drawn on an SVG over the two columns; only the curves take the pointer */
+.pair-wrap { position: relative; }
+svg.judas-layer { position: absolute; left: 0; top: 0; pointer-events: none; z-index: 5; overflow: hidden; }
+.judas-line { fill: none; stroke: var(--amber); stroke-width: 1.6; opacity: 0.85; }
+.judas-line.noted { stroke-width: 2.2; }
+.judas-line.off { opacity: 0.4; stroke-dasharray: 4 4; }
+.judas-hit { fill: none; stroke: transparent; stroke-width: 14; pointer-events: stroke; cursor: pointer; }
+.judas-hit:hover + .judas-line { opacity: 1; stroke-width: 2.6; }
+.judas-dot { fill: var(--amber); }
+body.judas-linking .textLayer { cursor: crosshair; }
+body.judas-linking .hl-rect { outline: 1px dashed var(--amber); }
+
+/* the Join button and this passage's links, inside the highlight editor */
+.hl-links { margin-bottom: 8px; }
+.hl-links .judas-start { width: 100%; background: var(--surface-2); color: var(--text); border: 1px solid var(--line);
+  border-radius: 5px; padding: 5px 10px; cursor: pointer; font: inherit; }
+.hl-links .judas-start:hover { border-color: var(--amber); }
+.judas-list { display: flex; flex-direction: column; gap: 3px; margin-top: 6px; }
+.judas-row { text-align: left; background: transparent; color: var(--text-dim); border: 1px solid var(--line-soft);
+  border-radius: 5px; padding: 4px 7px; cursor: pointer; font: inherit; font-size: 12.5px; }
+.judas-row:hover { color: var(--text); border-color: var(--amber); }
+
+/* the link's note popover: the two joined passages either side of the mark */
+.judas-pop .judas-ends { display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; }
+.judas-pop .judas-join { text-align: center; color: var(--amber); font-size: 12px; letter-spacing: .5px; }
+
+/* the margin list: links to documents not now shown */
+.pair-bar .judas-absent { background: var(--surface-2); color: var(--text); border: 1px solid var(--line);
+  border-radius: 5px; padding: 4px 10px; cursor: pointer; font: inherit; }
+.pair-bar .judas-absent:hover { border-color: var(--amber); }
+.judas-menu { position: fixed; z-index: 62; min-width: 220px; max-width: min(360px, calc(100vw - 16px));
+  background: var(--surface); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 6px 22px rgba(0,0,0,.55);
+  padding: 5px; display: flex; flex-direction: column; gap: 2px; }
+.judas-mrow { text-align: left; background: transparent; color: var(--text); border: 0; border-radius: 5px;
+  padding: 6px 8px; cursor: pointer; font: inherit; }
+.judas-mrow:hover { background: var(--surface-2); }

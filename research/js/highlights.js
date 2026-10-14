@@ -197,7 +197,11 @@
       var r = m.getBoundingClientRect();
       if (ev.clientX >= r.left && ev.clientX <= r.right && ev.clientY >= r.top && ev.clientY <= r.bottom) hit = m.dataset.id;
     });
-    if (hit) { ev.stopPropagation(); openEditor(hit, ev.clientX, ev.clientY); }
+    if (hit) {
+      ev.stopPropagation();
+      if (SW.links && SW.links.claimClick && SW.links.claimClick(hit, ev)) return;   // a join in progress takes the click
+      openEditor(hit, ev.clientX, ev.clientY);
+    }
   });
 
   // ---- the editor popover: colour, tags, a note, delete ----
@@ -237,12 +241,14 @@
     pop.querySelector('[data-act="delete"]').onclick = function () {
       commit();
       saveAll(all().filter(function (x) { return x.id !== id; }));
+      SW.emit('highlight:removed', id);   // the link layer prunes any judas on it
       closeEditor();
       repaintDoc(h.doc);
       SW.toast('Highlight removed');
     };
     pop.querySelector('.hl-tags').onchange = commit;
     pop.querySelector('.hl-note').onchange = commit;
+    SW.emit('highlight:editor', { pop: pop, h: h });   // the link layer appends its own section
   }
   function save(h) {
     var a = all(), i = a.map(function (x) { return x.id; }).indexOf(h.id);
@@ -263,6 +269,6 @@
 
   SW.highlights = {
     all: all, forDoc: forDoc, get: get, paintPage: paintPage, repaintDoc: repaintDoc,
-    colours: COLOURS, paintOf: paintOf, openEditor: openEditor
+    colours: COLOURS, paintOf: paintOf, openEditor: openEditor, closeEditor: closeEditor
   };
 })(typeof window !== 'undefined' ? window : globalThis);
