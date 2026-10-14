@@ -136,7 +136,12 @@
               docId: null, pdf: null, zoom: 1, io: null };
     o.pick.onchange = function () { open(side, o.pick.value); };
     head.querySelectorAll('[data-z]').forEach(function (b) {
-      b.onclick = function () { o.zoom *= (b.dataset.z === 'in' ? 1.15 : 1 / 1.15); if (o.docId) open(side, o.docId); };
+      b.onclick = function () {
+        if (!o.docId) return;
+        o.zoom *= (b.dataset.z === 'in' ? 1.15 : 1 / 1.15);
+        SW.store.set(keyBase() + 'zoom.' + o.docId, o.zoom);   // kept per document, so it survives a reload and a swap
+        open(side, o.docId);
+      };
     });
     return o;
   }
@@ -172,6 +177,7 @@
   function open(side, docId) {
     var o = COL[side], d = doc(docId); if (!d) return;
     ST.side[side] = docId; o.docId = docId; o.pick.value = docId; saveState();
+    o.zoom = +SW.store.get(keyBase() + 'zoom.' + docId, 1) || 1;   // this document's zoom, as last set
     SW.emit('pair:open', { side: side, docId: docId });
     if (o.io) { o.io.disconnect(); o.io = null; }
     o.pages.innerHTML = '<div class="pair-load hint">Opening ' + esc(cite(d)) + '…</div>';

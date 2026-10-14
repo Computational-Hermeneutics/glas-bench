@@ -29,6 +29,8 @@
   function get(id) { return all().filter(function (l) { return l.id === id; })[0] || null; }
   function quoteOf(hid) { var h = H() && H().get(hid); return h ? (h.selector.exact || '').replace(/\s+/g, ' ').trim() : ''; }
   function docOf(hid) { var h = H() && H().get(hid); return h ? h.doc : null; }
+  // a highlight's colour as solid ink, for the curves, their end dots and the insert cards' edges
+  function inkOf(hid) { var h = H() && H().get(hid); return H().paintOf(h && h.colour).replace(/[\d.]+\)$/, '0.95)'); }
   // the two documents a link touches: for a join both highlights' docs; for an insert the source's doc and the target doc
   function linkDocs(l) { return [docOf(l.a), l.kind === 'insert' ? (l.insertAt && l.insertAt.doc) : docOf(l.b)]; }
 
@@ -122,6 +124,7 @@
       var card = el('div', { class: 'ins-card', 'data-id': l.id });
       card.style.top = Math.max(2, top) + 'px';
       card.style[edge] = '6px';
+      card.style.borderColor = inkOf(l.a);   // the card's edge in its source passage's colour
       card.innerHTML = '<div class="ins-head">↳ ' + esc(srcCite(l.a)) + '</div>' +
         '<div class="ins-quote">' + esc(quoteOf(l.a).slice(0, 240)) + '</div>' +
         (l.note ? '<div class="ins-note">' + esc(l.note) + '</div>' : '');
@@ -177,9 +180,20 @@
       var hit = document.createElementNS(NS, 'path'); hit.setAttribute('d', d); hit.setAttribute('class', 'judas-hit'); hit.setAttribute('data-id', l.id);
       var line = document.createElementNS(NS, 'path'); line.setAttribute('d', d);
       line.setAttribute('class', 'judas-line' + (ly.off || ry.off ? ' off' : '') + (l.note ? ' noted' : ''));
+      // the curve takes its highlights' colours: one colour, or shading from one end to the other
+      var lc = inkOf(leftId), rc = inkOf(rightId);
+      if (lc === rc) line.style.stroke = lc;
+      else {
+        var g = document.createElementNS(NS, 'linearGradient'), gid = 'jg-' + l.id;
+        g.setAttribute('id', gid); g.setAttribute('gradientUnits', 'userSpaceOnUse');
+        g.setAttribute('x1', x1); g.setAttribute('y1', y1); g.setAttribute('x2', x2); g.setAttribute('y2', y2);
+        g.innerHTML = '<stop offset="0" stop-color="' + lc + '"/><stop offset="1" stop-color="' + rc + '"/>';
+        svg.appendChild(g);
+        line.style.stroke = 'url(#' + gid + ')';
+      }
       svg.appendChild(hit); svg.appendChild(line);
-      [[x1, y1], [x2, y2]].forEach(function (p) {
-        var c = document.createElementNS(NS, 'circle'); c.setAttribute('cx', p[0]); c.setAttribute('cy', p[1]); c.setAttribute('r', 3.5); c.setAttribute('class', 'judas-dot'); svg.appendChild(c);
+      [[x1, y1, lc], [x2, y2, rc]].forEach(function (p) {
+        var c = document.createElementNS(NS, 'circle'); c.setAttribute('cx', p[0]); c.setAttribute('cy', p[1]); c.setAttribute('r', 3.5); c.setAttribute('class', 'judas-dot'); c.style.fill = p[2]; svg.appendChild(c);
       });
     });
   }

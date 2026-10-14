@@ -2,6 +2,11 @@
 
 Changes to the bench. The bench keeps its own version numbers, raised by 0.0.1 with each change (the `?v=` on every script and stylesheet in `index.html`); this file records the versions published, newest first.
 
+## 0.2.7 (2026-10-14)
+
+- A judas is drawn in its highlights' colours: one colour when both passages share it, shading from one to the other when they differ, with each end's dot in its own colour. An insert card's edge takes its source passage's colour. Both follow a highlight when it is recoloured.
+- Each document's zoom is kept, so it survives a reload and goes with the document from one column to the other.
+
 ## 0.2.6 (2026-10-14)
 
 - The tabs move up into the top bar beside the brand, saving a row. The light colour themes (Listing paper, Paper, Sepia) take Glas's colours, warm paper and dark ink with an ochre gold, in place of the kit's Spacewar blue bar and magenta accent; the ground the PDF pages sit on follows each theme. A new icon: two columns with a judas across the gutter. The About box's Sources row is removed. The kit's code size (Settings, and A− and A+ in the top bar) now sizes the bench's own text over the documents, the insert cards, the editors and the list of links elsewhere; `js/textsize.js` relabels that part of Settings and hides the controls that only apply to code listings.
