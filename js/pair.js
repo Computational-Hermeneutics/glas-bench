@@ -100,7 +100,7 @@
     var bar = el('div', { class: 'pair-bar' },
       '<label class="pair-sesh">Session <select id="pair-session" aria-label="Session"></select></label>' +
       '<button class="btn" id="pair-swap" title="Swap the two columns">⇄ Swap sides</button>' +
-      '<span class="pair-hint hint">Select text in a column to highlight it. Joining passages across the gutter arrives next.</span>');
+      '<span class="pair-hint hint">Select text to highlight it; click a highlight to join it across the gutter or add a post-it; ✎ drops a post-it on the page.</span>');
     var wrap = el('div', { class: 'pair-wrap' });
     var left = columnEl('left'), gutter = el('div', { class: 'pair-gutter', 'aria-hidden': 'true' }), right = columnEl('right');
     wrap.append(left.el, gutter, right.el);

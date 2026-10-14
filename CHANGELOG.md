@@ -2,6 +2,10 @@
 
 Changes to the bench. The bench keeps its own version numbers, raised by 0.0.1 with each change (the `?v=` on every script and stylesheet in `index.html`); this file records the versions published, newest first.
 
+## 0.2.10 (2026-10-14)
+
+- The Pair view's hint says what can now be done: highlight, join, post-its.
+
 ## 0.2.9 (2026-10-14)
 
 - Post-its: comments on small cards floating on a page. ✎ in a column's head drops a free one on the page in view; Insert, in a highlight's editor, puts one beside that passage with a strip in its colour. A post-it is dragged by its top edge, folded by a double-click there, and removed with ×; its place is kept as a fraction of the page, so it holds through zoom and reload and follows its document between the columns. Kept in this browser under `glasbench.postits` (`js/postits.js`). This replaces the earlier insert, which carried a passage into the other column; inserts made that way are left in storage but no longer shown.
