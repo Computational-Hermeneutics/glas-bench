@@ -2,6 +2,10 @@
 
 Changes to the bench. The bench keeps its own version numbers, raised by 0.0.1 with each change (the `?v=` on every script and stylesheet in `index.html`); this file records the versions published, newest first.
 
+## 0.2.8 (2026-10-14)
+
+- The site map is removed: its link in the top bar, its entry in the Help menu (`sitemap: false` in `config.js`) and the page itself.
+
 ## 0.2.7 (2026-10-14)
 
 - A judas is drawn in its highlights' colours: one colour when both passages share it, shading from one to the other when they differ, with each end's dot in its own colour. An insert card's edge takes its source passage's colour. Both follow a highlight when it is recoloured.

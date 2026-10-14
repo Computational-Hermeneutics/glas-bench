@@ -74,7 +74,7 @@
     },
     // the Versions menu is reduced to the About box for the skeleton (no compare/genealogy)
     menus: { versions: [['about', 'About the bench', 'Version, sources, citation']] },
-    sitemap: true,
+    sitemap: false,                                        // no site map page
     reading: {
       intro: 'Where to begin on reading a technical document and a critical text against each other.',
       menu: 'Reading the two columns',
