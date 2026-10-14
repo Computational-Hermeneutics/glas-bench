@@ -165,22 +165,42 @@
   }
   function colObj(side) { return SW.pair && SW.pair.col ? SW.pair.col[side] : null; }
 
-  // Keep a selection inside the column (and page) it starts in. Without this, dragging past the end
-  // of the text lets the browser's selection run on through the DOM into the other column. While
-  // selecting, everything but this text layer is unselectable (css: body.hl-selecting), and the
-  // layer gets PDF.js's end-of-content block, which fills the page so a drag into blank margin
-  // stays on it.
+  // Keep a selection inside the text layer (the page) it starts in. Without this, dragging past
+  // the end of the text lets the browser's selection run on through the DOM into the other column.
+  // The layer gets PDF.js's end-of-content block, which fills the page while selecting so a drag
+  // into blank margin stays on it; and if the selection's moving end leaves the layer all the same
+  // (into the gutter, the other column, the bar), it is held at the layer's start or end. Nothing
+  // is restyled beyond the one layer, so a drag starts and ends at once even on a long document.
+  var selLayer = null, clamping = false;
   document.addEventListener('mousedown', function (ev) {
     var tl = ev.button === 0 && ev.target.closest && ev.target.closest('.pair-col .textLayer');
     if (!tl) return;
     if (!tl.querySelector(':scope > .endOfContent')) tl.append(el('div', { class: 'endOfContent' }));
     tl.classList.add('selecting');
-    document.body.classList.add('hl-selecting');
+    selLayer = tl;
   }, true);
   function endSelecting() {
-    document.body.classList.remove('hl-selecting');
-    document.querySelectorAll('.textLayer.selecting').forEach(function (t) { t.classList.remove('selecting'); });
+    if (selLayer) selLayer.classList.remove('selecting');
+    selLayer = null;
   }
+  function textEnds(tl) {
+    var w = document.createTreeWalker(tl, NodeFilter.SHOW_TEXT, null), first = w.nextNode(), last = first, n;
+    while ((n = w.nextNode())) last = n;
+    return first ? { first: first, last: last } : null;
+  }
+  document.addEventListener('selectionchange', function () {
+    if (!selLayer || clamping) return;
+    var sel = window.getSelection(); if (!sel || !sel.rangeCount || !sel.focusNode) return;
+    if (selLayer.contains(sel.focusNode) || !selLayer.contains(sel.anchorNode)) return;
+    var ends = textEnds(selLayer); if (!ends) return;
+    var after = selLayer.compareDocumentPosition(sel.focusNode) & Node.DOCUMENT_POSITION_FOLLOWING;
+    clamping = true;
+    try {
+      if (after) sel.setBaseAndExtent(sel.anchorNode, sel.anchorOffset, ends.last, ends.last.nodeValue.length);
+      else sel.setBaseAndExtent(sel.anchorNode, sel.anchorOffset, ends.first, 0);
+    } catch (e) { /* the anchor moved on */ }
+    clamping = false;
+  });
   document.addEventListener('mouseup', function () { setTimeout(endSelecting, 0); }, true);
   window.addEventListener('blur', endSelecting);
 

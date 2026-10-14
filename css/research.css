@@ -272,8 +272,6 @@ body.judas-linking .hl-rect { outline: 1px dashed var(--amber); }
 .hl-pop .hl-quote, .judas-row { font-size: 0.95em; }
 
 /* selecting text: the selection stays in the text layer it started in (js/highlights.js) */
-body.hl-selecting, body.hl-selecting * { -webkit-user-select: none; user-select: none; }
-body.hl-selecting .textLayer.selecting, body.hl-selecting .textLayer.selecting span { -webkit-user-select: text; user-select: text; }
 .textLayer .endOfContent { display: block; position: absolute; left: 0; top: 100%; right: 0; bottom: 0; z-index: -1;
   cursor: default; -webkit-user-select: none; user-select: none; }
 .textLayer.selecting .endOfContent { top: 0; }

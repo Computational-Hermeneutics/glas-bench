@@ -200,6 +200,7 @@
     o.zoom = +SW.store.get(keyBase() + 'zoom.' + docId, 1) || 1;   // this document's zoom, as last set
     SW.emit('pair:open', { side: side, docId: docId });
     if (o.io) { o.io.disconnect(); o.io = null; }
+    if (o.keep) { o.keep.disconnect(); o.keep = null; }
     o.pages.innerHTML = '<div class="pair-load hint">Opening ' + esc(cite(d)) + '…</div>';
     Promise.all([pdfjs(), sources(d)]).then(function (r) {
       var lib = r[0], tries = r[1], i = 0;
@@ -257,12 +258,28 @@
         });
       }, { root: o.scroll, rootMargin: '400px 0px' });
       o.io = io;
-      o.pages.querySelectorAll('.pdf-page').forEach(function (pg) { io.observe(pg); });
+      // Pages well out of view give up their canvas and text layer, and are drawn again (with their
+      // highlights and post-its) when scrolled back to: a long document then holds only the pages
+      // near the reader, not hundreds of megabytes of canvas.
+      var keep = new IntersectionObserver(function (ents) {
+        ents.forEach(function (e) { if (!e.isIntersecting && e.target.dataset.done) release(e.target); });
+      }, { root: o.scroll, rootMargin: '2400px 0px' });
+      o.keep = keep;
+      o.pages.querySelectorAll('.pdf-page').forEach(function (pg) { io.observe(pg); keep.observe(pg); });
     });
+  }
+
+  function release(pg) {
+    pg.querySelectorAll('canvas, .textLayer, .hl-layer, .pit-layer').forEach(function (x) {
+      if (x.tagName === 'CANVAS') { x.width = 0; x.height = 0; }   // let the browser free it at once
+      x.remove();
+    });
+    delete pg.dataset.done;
   }
 
   function renderPage(o, pdf, n, scale, pg) {
     pdf.getPage(n).then(function (page) {
+      if (!pg.dataset.done || !document.contains(pg)) return;   // released, or the column moved on
       var vp = page.getViewport({ scale: scale });
       pg.style.width = vp.width + 'px'; pg.style.height = vp.height + 'px';
       var dpr = window.devicePixelRatio || 1;
@@ -275,6 +292,7 @@
       page.render({ canvasContext: ctx, viewport: vp, transform: dpr !== 1 ? [dpr, 0, 0, dpr, 0, 0] : null });
       // the text layer, over the canvas, so text can be selected
       page.getTextContent().then(function (tc) {
+        if (!pg.dataset.done) return;                     // released before its text arrived
         var tl = el('div', { class: 'textLayer' });
         tl.style.width = vp.width + 'px'; tl.style.height = vp.height + 'px';
         tl.style.setProperty('--scale-factor', scale);
