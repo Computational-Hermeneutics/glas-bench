@@ -7,9 +7,11 @@
 (function (root) {
   'use strict';
   root.SW.BENCH.shell = {
-    // Glas keeps Read, Findings, My notes and Paratexts for now; the genealogy half
-    // (Text/analyse, Functional, Compare, Genealogy) is switched off. The Pair, Sessions
-    // and Threads views are added in the phases that follow. About is reached through Help.
-    views: ['read', 'about', 'findings', 'notes', 'paratexts']
+    // Pair is Glas's main view (two documents side by side). Read is kept for one document on
+    // its own. The genealogy half (Text/analyse, Functional, Compare, Genealogy) is switched
+    // off. Sessions and Threads are added in the phases that follow; About is reached through Help.
+    views: ['pair', 'read', 'about', 'findings', 'notes', 'paratexts'],
+    // open on the Pair view unless a link asks for another tab
+    query: function (q) { if (!q.tab) q.tab = 'pair'; }
   };
 })(this);

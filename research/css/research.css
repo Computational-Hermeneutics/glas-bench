@@ -71,3 +71,64 @@ button.badge.err { cursor: pointer; font: inherit; }
 .vlang { font: 10px var(--mono); letter-spacing: 0.5px; color: var(--text-faint); margin-left: 8px; white-space: nowrap; }
 @media (max-width: 900px) { .vlang { display: none; } }
 
+
+/* ============================================================
+   Glas Bench overrides and the Pair view
+   ============================================================ */
+
+/* the default dark theme, warmed towards gold so it reads as Glas */
+:root {
+  --code-bg: #0e0c08;
+  --bg: #15130e; --bg-2: #1b1811; --surface: #1e1a12; --surface-2: #262016;
+  --line: #3a3426; --line-soft: #2a2519;
+  --text: #ece6d6; --text-dim: #b5ad98; --text-faint: #8a836f;
+  --beam: #d8b63c;                 /* gold, the bench's lead colour */
+  --amber: #c9a227;                /* annotations, titles, the current line */
+  --hl: rgba(201, 162, 39, 0.16);
+  --noted-bg: rgba(201, 162, 39, 0.07);
+  --sel: rgba(201, 162, 39, 0.18);
+  --bar-1: #1b1811; --bar-2: #15130e; --bar-fg: #ece6d6; --bar-line: #0a0906;
+}
+
+/* the header version picker is not used by the Pair view (each column has its own) */
+header.bar .pick { display: none; }
+
+/* ---------- the Pair view: two columns of equal standing ---------- */
+#view-pair.view.on { display: flex; flex-direction: column; min-height: 0; padding: 0; }
+.pair-bar { display: flex; align-items: center; gap: 14px; padding: 7px 12px; border-bottom: 1px solid var(--line);
+  background: var(--bg-2); flex: 0 0 auto; flex-wrap: wrap; }
+.pair-bar select { background: var(--pick-bg, rgba(0,0,0,.3)); color: var(--text); border: 1px solid var(--line);
+  border-radius: 5px; padding: 3px 6px; font: inherit; }
+.pair-bar .pair-hint { margin-left: auto; }
+.pair-bar .btn { background: var(--surface-2); color: var(--text); border: 1px solid var(--line);
+  border-radius: 5px; padding: 4px 10px; cursor: pointer; font: inherit; }
+.pair-bar .btn:hover { border-color: var(--amber); }
+
+.pair-wrap { display: flex; align-items: stretch; min-height: 0; }
+.pair-col { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; background: var(--bg); }
+.pair-gutter { flex: 0 0 2px; background: var(--line); }
+.pair-head { display: flex; align-items: center; gap: 8px; padding: 6px 10px; border-bottom: 1px solid var(--line-soft);
+  background: var(--surface); flex: 0 0 auto; }
+.pair-head .pair-pick { flex: 1 1 auto; min-width: 0; background: var(--pick-bg, rgba(0,0,0,.3)); color: var(--text);
+  border: 1px solid var(--line); border-radius: 5px; padding: 3px 6px; font: inherit; }
+.pair-head .pair-zoom { flex: 0 0 auto; display: inline-flex; gap: 2px; }
+
+.pair-scroll { flex: 1 1 auto; min-height: 0; overflow: auto; padding: 12px; background: var(--code-bg); }
+.pair-pages { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.pair-load, .pair-open { padding: 18px; }
+.pair-open .btn { background: var(--surface-2); color: var(--text); border: 1px solid var(--amber);
+  border-radius: 5px; padding: 5px 12px; cursor: pointer; margin-top: 8px; }
+.pair-file { display: none; }
+
+/* a rendered page: the canvas with its selectable text layer over it */
+.pdf-page { position: relative; background: #fff; box-shadow: 0 1px 6px rgba(0,0,0,.5); }
+.pdf-canvas { display: block; }
+
+/* the PDF.js text layer: transparent text positioned over the canvas, selectable */
+.textLayer { position: absolute; left: 0; top: 0; right: 0; bottom: 0; overflow: hidden; line-height: 1;
+  text-align: initial; opacity: 1; }
+.textLayer span, .textLayer br { color: transparent; position: absolute; white-space: pre; cursor: text;
+  transform-origin: 0% 0%; }
+.textLayer span.markedContent { top: 0; height: 0; }
+.textLayer ::selection { background: rgba(201, 162, 39, 0.45); }
+.textLayer ::-moz-selection { background: rgba(201, 162, 39, 0.45); }

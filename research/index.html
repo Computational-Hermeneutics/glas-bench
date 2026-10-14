@@ -43,7 +43,8 @@
   </header>
 
   <nav class="tabs" id="tabs" aria-label="Views">
-    <button data-menu="read" data-tabs="read" class="on" aria-expanded="false" title="Read a document">Read <span class="caret" aria-hidden="true">▾</span></button>
+    <button data-tab="pair" class="on" title="Read two documents side by side, a column each, against each other">Pair</button>
+    <button data-menu="read" data-tabs="read" aria-expanded="false" title="Read one document on its own">Read <span class="caret" aria-hidden="true">▾</span></button>
     <button data-tab="about" title="About the bench: its purpose, sources and citation">About</button>
     <button data-tab="findings" title="What the bench and the group have established, with evidence; shared">Findings</button>
     <button data-tab="notes" title="What you have gathered for writing: excerpts, notes, findings; private, in this browser">My notes</button>
@@ -54,7 +55,8 @@
   <noscript><div class="noscript">Glas Bench runs in JavaScript, which is turned off in this browser. The <a href="sitemap.html">site map</a> lists every document with its source.</div></noscript>
 
   <main id="main">
-    <section class="view on" id="view-read"></section>
+    <section class="view on" id="view-pair"></section>
+    <section class="view" id="view-read"></section>
     <section class="view" id="view-about"></section>
     <section class="view" id="view-findings"></section>
     <section class="view" id="view-notes"></section>
@@ -72,6 +74,7 @@
   <script src="kit/genealogy.js?v=0.1.0"></script>
   <script src="kit/base.js?v=0.1.0"></script>
   <script src="js/config.js?v=0.1.0"></script>
+  <script src="js/programme.js?v=0.1.0"></script>
   <script src="kit/md.js?v=0.1.0"></script>
   <script src="kit/themes.js?v=0.1.0"></script>
   <script src="kit/refs.js?v=0.1.0"></script>
@@ -104,6 +107,7 @@
   <script src="kit/guides.js?v=0.1.0"></script>
   <script src="kit/helppages.js?v=0.1.0"></script>
   <script src="kit/about.js?v=0.1.0"></script>
+  <script src="js/pair.js?v=0.1.0"></script>
   <script src="js/main.js?v=0.1.0"></script>
   <script src="kit/shell.js?v=0.1.0"></script>
 </body>
